@@ -1,0 +1,109 @@
+= sfUrchinPlugin plugin =
+
+Easily adds tracking code for [http://www.google.com/analytics Google Analytics] to your presentation layer.
+
+== Features ==
+
+ * `sfUrchinFilter`: Adds necessary tracking code to the bottom of every HTML page.
+ * `UrchinHelper`: Helper functions for adding `urchinTracker` calls to links.
+
+== Installation ==
+
+ * Install the plugin:
+ 
+  {{{
+  ./symfony install-plugin http://plugins.symfony-project.com/sfUrchinPlugin
+  }}}
+ 
+ * Configure your Google Analytics account in `app.yml`:
+ 
+  {{{
+  prod:
+    urchin:
+      enabled:     on
+      uacct:       UA-XXXXXXX-X # <-- put your site's account number here
+    
+  all:
+    urchin:
+      enabled:     off
+  }}}
+ 
+ * Add `sfUrchinFilter` to `filters.yml` just after `rendering`:
+ 
+  {{{
+  rendering: ~
+  urchin:
+    class: sfUrchinFilter
+  web_debug: ~
+  # etc...
+  }}}
+
+== Usage ==
+
+Just by adding the filter and enabling the plugin in `app.yml` your site should begin tracking on your Google Analytics account. Beyond this, there are three more pieces of functionality that allow you finer control over how your site interacts with Google Analytics.
+
+=== Track a page as a URI other than its own: `sfUrchinToolkit::setUtParam()` ===
+
+  {{{
+  null sfUrchinToolkit::setUtParam(string $utParam)
+  }}}
+
+If any of your actions call any of the `forward` methods, the action that actually renders will likely not be the action referenced in the browser's address bar. This method allows you to specify a URI to send up to Google Analytics once the page is loaded other that what is in the address bar.
+
+For example, if you want to track how many visitors land on your `error_404_action`, you could call this from inside that action:
+
+  {{{
+  sfUrchinToolkit::setUtParam('/error/404?page='.$this->getModuleName().'/'.$this->getActionName());
+  }}}
+
+=== Track clicks on a link: `urchin_link_to()` ===
+
+  {{{
+  string urchin_link_to(string $name, string $internalUri[, string $urchinUri[, array $options]])
+  }}}
+
+You'll want to use this helper to track outbound links as well as those that go to a local file that doesn't have Google Analytics tracking code at the bottom (e.g. a PDF or image).
+
+For example, if you want to track a link to the symfony site:
+
+  {{{
+  <?php use_helper('Urchin') ?>
+  
+  <p>
+    For more information, please visit the <?php echo urchin_link_to('symfony project site', 'http://www.symfony-project.com', '/outbound/symfony') ?>.
+  </p>
+  }}}
+
+Or to track downloads of a PDF:
+
+  {{{
+  <?php use_helper('Urchin') ?>
+  
+  <p>
+    You can also download <?php echo urchin_link_to('the PDF version', '/doc/the-book.pdf') ?>.
+  </p>
+  }}}
+
+=== Track clicks on a Javascript link: `urchin_link_to_function()` ===
+
+  {{{
+  string urchin_link_to_function(string $name, string $function, string $urchinUri[, array $options])
+  }}}
+
+This helper function will send a call to Google Analytics when your user clicks a Javascript link. For example, if you want to track calls to a link that closes a popup window:
+
+  {{{
+  <?php use_helper('Urchin') ?>
+  
+  <p><?php echo urchin_link_to_function('close window', 'window.close()', '/popups/mom/close', 'id=closer') ?></p>
+  }}}
+
+== Changelog ==
+
+=== Version 0.1.0-beta ===
+
+ * Initial public release.
+
+== Maintainers ==
+
+Kris Wallsmith
