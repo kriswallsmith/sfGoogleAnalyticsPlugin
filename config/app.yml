@@ -1,5 +1,16 @@
 # all:
 #   urchin:
-#     enabled:  off
-#     uacct:    ~
-#     usrc:     http://www.google-analytics.com/urchin.js
+#     enabled:      off
+#     uacct:        ~       # Profile number
+#     vars:                 # Custom init variables     - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55585
+#       udn:        ~       # Set a custom domain name  - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55524
+#       uccn:       ~       # Custom campaign variable  - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55577
+#       ucsr:       ~       # Custom source variable
+#       ucmd:       ~       # Custom medium variable
+#       uctr:       ~       # Custom term variable
+#       ucct:       ~       # Custom content variable
+#       ulink:      ~       # Linker functionality      - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55532
+#       utimeout:   ~       # Inactive timeout          - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55463
+#       userv:      ~       # Urchin server             - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55474
+#     usrc:         http://www.google-analytics.com/urchin.js
+#     usrc_ssl:     https://ssl.google-analytics.com/urchin.js

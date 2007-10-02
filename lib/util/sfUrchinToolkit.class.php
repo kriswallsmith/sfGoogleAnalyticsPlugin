@@ -20,59 +20,79 @@ class sfUrchinToolkit
    */
   public static function getHtml()
   {
-    if(sfConfig::get('app_urchin_enabled'))
+    sfLoader::loadHelpers(array('Escaping'));
+    
+    $context = sfContext::getInstance();
+    $request = $context->getRequest();
+    $module  = $context->getModuleName();
+    $action  = $context->getActionName();
+    
+    $actionConfig = sfConfig::get('mod_'.$module.'_'.$action.'_urchin', array());
+    
+    $usrc = $request->isSecure() ? 
+      sfConfig::get('app_urchin_usrc_ssl', 'https://ssl.google-analytics.com/urchin.js') : 
+      sfConfig::get('app_urchin_usrc', 'http://www.google-analytics.com/urchin.js');
+    
+    // initial parameter
+    $utParam = '';
+    if (isset($actionConfig['ut_param']))
     {
-      $uacct = sfConfig::get('app_urchin_uacct');
-      if(!$uacct)
+      $utParam = $actionConfig['ut_param'];
+    }
+    else
+    {
+      $utParam = sfConfig::get('app_urchin_ut_param');
+      $utParam = sfConfig::get('mod_'.$module.'_urchin_ut_param', $utParam);
+    }
+    
+    // initialization variables
+    $vars = sfConfig::get('app_urchin_vars', array());
+    $vars = array_merge($vars, sfConfig::get('mod_'.$module.'_urchin_vars', array()));
+    if (isset($actionConfig['vars']) && is_array($actionConfig['vars']))
+    {
+      $vars = array_merge($vars, $actionConfig['vars']);
+    }
+    
+    // account number is required
+    if (!isset($vars['uacct']) && !isset($vars['_uacct']))
+    {
+      // backwards compatibility
+      $vars['uacct'] = sfConfig::get('app_urchin_uacct');
+      if (!$vars['uacct'])
       {
-        $msg = 'Please add your Urchin account number to your app.yml (urchin_uacct)';
-        
-        throw new sfUrchinException($msg);
+        throw new sfUrchinException('Please add your Urchin account number to your app.yml.');
       }
-      
-      $usrc = sfConfig::get('app_urchin_usrc', 'http://www.google-analytics.com/urchin.js');
-      
-      $utParam = self::getUtParam();
-      if($utParam)
+    }
+    
+    // prep the initial parameter
+    if ($utParam)
+    {
+      $utParam = sprintf('"%s"', esc_js_no_entities($utParam));
+      $utParam = str_replace('\\/', '/', $utParam);
+    }
+    
+    // build initialization variables
+    $jsVars = array();
+    foreach ($vars as $key => $value)
+    {
+      if ($key{0} != '_')
       {
-        $utParam = '"'.$utParam.'"';
+        $key = '_'.$key;
       }
-      
-      $html = <<<EOD
-<script src="$usrc" type="text/javascript"></script>
+      $jsVars[] = sprintf("%s=\"%s\";", $key, esc_js_no_entities($value));
+    }
+    $jsVars = join("\n", $jsVars);
+    
+    $html = <<<EOD
+<script src="%s" type="text/javascript"></script>
 <script type="text/javascript">
-_uacct = "$uacct";
-urchinTracker($utParam);
+%s
+urchinTracker(%s);
 </script>
 EOD;
-      
-      return $html;
-    }
+    $html = sprintf($html, $usrc, $jsVars, $utParam);
+    
+    return $html;
   }
   
-  /**
-   * Set a custom ut_param for use in the first urchinTracker() call.
-   * 
-   * @author  Kris Wallsmith
-   * 
-   * @param   string $utParam
-   */
-  public static function setUtParam($utParam)
-  {
-    sfContext::getInstance()->getResponse()->setParameter('ut_param', $utParam);
-  }
-  
-  /**
-   * Get any custom ut_param set in the response object.
-   * 
-   * @author  Kris Wallsmith
-   * 
-   * @param   string $defaultValue
-   * 
-   * @return  string
-   */
-  public static function getUtParam($defaultValue = null)
-  {
-    return sfContext::getInstance()->getResponse()->getParameter('ut_param', $defaultValue);
-  }
 }

@@ -4,6 +4,7 @@ Easily adds tracking code for [http://www.google.com/analytics Google Analytics]
 
 == Features ==
 
+ * `sfUrchinActionMixin`: Adds convenience methods to your actions.
  * `sfUrchinFilter`: Adds necessary tracking code to the bottom of every HTML page.
  * `UrchinHelper`: Helper functions for adding `urchinTracker` calls to links.
 
@@ -12,7 +13,7 @@ Easily adds tracking code for [http://www.google.com/analytics Google Analytics]
  * Install the plugin:
  
   {{{
-  ./symfony install-plugin http://plugins.symfony-project.com/sfUrchinPlugin
+  ./symfony plugin-install http://plugins.symfony-project.com/sfUrchinPlugin
   }}}
  
  * Configure your Google Analytics account in `app.yml`:
@@ -40,23 +41,51 @@ Easily adds tracking code for [http://www.google.com/analytics Google Analytics]
 
 == Usage ==
 
-Just by adding the filter and enabling the plugin in `app.yml` your site should begin tracking on your Google Analytics account. Beyond this, there are three more pieces of functionality that allow you finer control over how your site interacts with Google Analytics.
+Just by adding the filter and enabling the plugin in `app.yml` your site should begin tracking on your Google Analytics account. Beyond this, there are a few more pieces of functionality that allow you finer control over how your site interacts with Google Analytics.
 
-=== Track a page as a URI other than its own: `sfUrchinToolkit::setUtParam()` ===
-
-  {{{
-  null sfUrchinToolkit::setUtParam(string $utParam)
-  }}}
-
-If any of your actions call any of the `forward` methods, the action that actually renders will likely not be the action referenced in the browser's address bar. This method allows you to specify a URI to send up to Google Analytics once the page is loaded other that what is in the address bar.
-
-For example, if you want to track how many visitors land on your `error_404_action`, you could call this from inside that action:
+=== Track a page as a custom URI ===
 
   {{{
-  sfUrchinToolkit::setUtParam('/error/404?page='.$this->getModuleName().'/'.$this->getActionName());
+  // from inside an action
+  null $this->setUrchinParam(string $utParam)
   }}}
 
-=== Track clicks on a link: `urchin_link_to()` ===
+If any of your actions call any of the `forward` methods, the action that actually renders will likely not be the action referenced in the browser's address bar. This mixed-in method allows you to specify a URI to send up to Google Analytics once the page is loaded other that what is in the address bar.
+
+For example, if you want to track how many visitors land on your `error_404_action`, you could call this:
+
+  {{{
+  // from inside an action
+  $this->setUrchinParam('/error/404?page='.$this->getModuleName().'/'.$this->getActionName());
+  }}}
+
+=== Set a custom initialization variable ===
+
+  {{{
+  // from inside an action
+  null $this->addUrchinVar(string $name, string $value)
+  }}}
+
+You can add a custom variable to the Javascript code that initializes Google Analytics using this method. For example, if you want to track an action as a different subdomain:
+
+  {{{
+  // from inside an action
+  $this->addUrchinVar('udn', 'domain.com');
+  }}}
+
+This call will add a `_udn` variable to your initialization block:
+
+  {{{
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+  _uacct="xx-xxxxxxx-x";
+  _udn="domain.com";
+  urchinTracker();
+  </script>
+  }}}
+
+=== Track clicks on a link ===
 
   {{{
   string urchin_link_to(string $name, string $internalUri[, string $urchinUri[, array $options]])
@@ -70,7 +99,10 @@ For example, if you want to track a link to the symfony site:
   <?php use_helper('Urchin') ?>
   
   <p>
-    For more information, please visit the <?php echo urchin_link_to('symfony project site', 'http://www.symfony-project.com', '/outbound/symfony') ?>.
+    For more information, please visit the 
+    <?php echo urchin_link_to('symfony project site', 
+                              'http://www.symfony-project.com', 
+                              '/outbound/symfony') ?>.
   </p>
   }}}
 
@@ -80,11 +112,12 @@ Or to track downloads of a PDF:
   <?php use_helper('Urchin') ?>
   
   <p>
-    You can also download <?php echo urchin_link_to('the PDF version', '/doc/the-book.pdf') ?>.
+    You can also download <?php echo urchin_link_to('the PDF version', 
+                                                    '/doc/the-book.pdf') ?>.
   </p>
   }}}
 
-=== Track clicks on a Javascript link: `urchin_link_to_function()` ===
+=== Track clicks on a Javascript link ===
 
   {{{
   string urchin_link_to_function(string $name, string $function, string $urchinUri[, array $options])
@@ -95,10 +128,26 @@ This helper function will send a call to Google Analytics when your user clicks 
   {{{
   <?php use_helper('Urchin') ?>
   
-  <p><?php echo urchin_link_to_function('close window', 'window.close()', '/popups/mom/close', 'id=closer') ?></p>
+  <p><?php echo urchin_link_to_function('close window', 
+                                        'window.close()', 
+                                        '/popups/mom/close', 
+                                        'id=closer') ?></p>
   }}}
 
+== Roadmap ==
+
+Support for:
+
+ * `__utmLinker()`
+ * `__utmLinkPost()`
+
 == Changelog ==
+
+=== Version 0.2.0-beta ===
+
+ * Added support for SSL requests.
+ * Added mixin methods to actions for easy modification of initialization variables and parameters.
+ * Added escaping of Javascript values.
 
 === Version 0.1.0-beta ===
 
