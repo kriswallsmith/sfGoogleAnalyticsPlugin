@@ -109,7 +109,7 @@ class sfUrchinFilter extends sfFilter
     $response = $this->getContext()->getResponse();
     
     $oldContent = $response->getContent();
-    $newContent = str_ireplace('<body>', '<body>'.$trackingCode, $oldContent);
+    $newContent = preg_replace('/\<body[^\>]*\>/i', "$0".$trackingCode, $oldContent, 1);
     
     if ($oldContent == $newContent)
     {
