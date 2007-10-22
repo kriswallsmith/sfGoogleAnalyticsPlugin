@@ -29,13 +29,13 @@ Easily adds tracking code for [http://www.google.com/analytics Google Analytics]
       enabled:     off
   }}}
  
- * Add `sfUrchinFilter` to `filters.yml` just after `rendering`:
+ * Add `sfUrchinFilter` to `filters.yml` just after `web_debug`:
  
   {{{
   rendering: ~
+  web_debug: ~
   urchin:
     class: sfUrchinFilter
-  web_debug: ~
   # etc...
   }}}
 

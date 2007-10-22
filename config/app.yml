@@ -2,6 +2,7 @@
 #   urchin:
 #     enabled:      off
 #     uacct:        ~       # Profile number
+#     insertion:    bottom  # Where to insert the tracking code (top or bottom)
 #     vars:                 # Custom init variables     - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55585
 #       udn:        ~       # Set a custom domain name  - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55524
 #       uccn:       ~       # Custom campaign variable  - http://www.google.com/support/googleanalytics/bin/answer.py?answer=55577
