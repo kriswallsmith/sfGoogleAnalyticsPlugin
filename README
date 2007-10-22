@@ -22,7 +22,7 @@ Easily adds tracking code for [http://www.google.com/analytics Google Analytics]
   prod:
     urchin:
       enabled:     on
-      uacct:       UA-XXXXXXX-X # <-- put your site's account number here
+      uacct:       xx-xxxxxxx-x # <-- put your site's account number here
     
   all:
     urchin:
@@ -134,6 +134,23 @@ This helper function will send a call to Google Analytics when your user clicks 
                                         'id=closer') ?></p>
   }}}
 
+=== Specify where tracking code should be inserted ===
+
+By changing the `insertion` configuration variable, you can specify where in the response content the tracking code should be placed. The plugin comes with two options pre-built, `top` and `bottom`.
+
+  {{{
+  prod:
+    urchin:
+      enabled:    on
+  
+  all:
+    urchin:
+      uacct:      xx-xxxxxxx-x
+      insertion:  top
+  }}}
+
+These settings will place the tracking code just inside the response's opening `<body>` tag (in the `prod` environment). The plugin defaults to placing the tracking code just before the response's closing `</body>` tag.
+
 == Roadmap ==
 
 Support for:
@@ -142,6 +159,11 @@ Support for:
  * `__utmLinkPost()`
 
 == Changelog ==
+
+=== Version 0.3.0-beta ===
+
+ * Broke filter logic into protected methods for easy overloading.
+ * Added insertion configuration.
 
 === Version 0.2.0-beta ===
 
