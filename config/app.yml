@@ -1,5 +1,5 @@
 # all:
-#   urchin:
+#   google_analytics:
 #     enabled:      off
 #     uacct:        ~       # Profile number
 #     insertion:    bottom  # Where to insert the tracking code (top or bottom)

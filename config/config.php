@@ -1,4 +1,4 @@
 <?php
 
-sfMixer::register('sfComponent', array('sfUrchinActionMixin', 'setUrchinParam'));
-sfMixer::register('sfComponent', array('sfUrchinActionMixin', 'addUrchinVar'));
+sfMixer::register('sfComponent', array('sfGoogleAnalyticsActionMixin', 'setGoogleAnalyticsParam'));
+sfMixer::register('sfComponent', array('sfGoogleAnalyticsActionMixin', 'addGoogleAnalyticsVar'));

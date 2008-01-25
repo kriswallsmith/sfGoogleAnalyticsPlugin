@@ -1,41 +1,41 @@
-= sfUrchinPlugin plugin =
+= sfGoogleAnalyticsPlugin plugin =
 
 Easily adds tracking code for [http://www.google.com/analytics Google Analytics] to your presentation layer.
 
 == Features ==
 
- * `sfUrchinActionMixin`: Adds convenience methods to your actions.
- * `sfUrchinFilter`: Adds necessary tracking code to the bottom of every HTML page.
- * `UrchinHelper`: Helper functions for adding `urchinTracker` calls to links.
+ * `sfGoogleAnalyticsActionMixin`: Adds convenience methods to your actions.
+ * `sfGoogleAnalyticsFilter`: Adds necessary tracking code to the bottom of every HTML page.
+ * `GoogleAnalyticsHelper`: Helper functions for adding `urchinTracker` calls to links.
 
 == Installation ==
 
  * Install the plugin:
  
   {{{
-  ./symfony plugin-install http://plugins.symfony-project.com/sfUrchinPlugin
+  ./symfony plugin-install http://plugins.symfony-project.com/sfGoogleAnalyticsPlugin
   }}}
  
  * Configure your Google Analytics account in `app.yml`:
  
   {{{
   prod:
-    urchin:
+    google_analytics:
       enabled:     on
       uacct:       xx-xxxxxxx-x # <-- put your site's account number here
     
   all:
-    urchin:
+    google_analytics:
       enabled:     off
   }}}
  
- * Add `sfUrchinFilter` to `filters.yml` just after `web_debug`:
+ * Add `sfGoogleAnalyticsFilter` to `filters.yml` just after `web_debug`:
  
   {{{
   rendering: ~
   web_debug: ~
-  urchin:
-    class: sfUrchinFilter
+  google_analytics:
+    class: sfGoogleAnalyticsFilter
   # etc...
   }}}
 
@@ -47,7 +47,7 @@ Just by adding the filter and enabling the plugin in `app.yml` your site should 
 
   {{{
   // from inside an action
-  null $this->setUrchinParam(string $utParam)
+  null $this->setGoogleAnalyticsParam(string $utParam)
   }}}
 
 If any of your actions call any of the `forward` methods, the action that actually renders will likely not be the action referenced in the browser's address bar. This mixed-in method allows you to specify a URI to send up to Google Analytics once the page is loaded other that what is in the address bar.
@@ -56,21 +56,21 @@ For example, if you want to track how many visitors land on your `error_404_acti
 
   {{{
   // from inside an action
-  $this->setUrchinParam('/error/404?page='.$this->getModuleName().'/'.$this->getActionName());
+  $this->setGoogleAnalyticsParam('/error/404?page='.$this->getModuleName().'/'.$this->getActionName());
   }}}
 
 === Set a custom initialization variable ===
 
   {{{
   // from inside an action
-  null $this->addUrchinVar(string $name, string $value)
+  null $this->addGoogleAnalyticsVar(string $name, string $value)
   }}}
 
 You can add a custom variable to the Javascript code that initializes Google Analytics using this method. For example, if you want to track an action as a different subdomain:
 
   {{{
   // from inside an action
-  $this->addUrchinVar('udn', 'domain.com');
+  $this->addGoogleAnalyticsVar('udn', 'domain.com');
   }}}
 
 This call will add a `_udn` variable to your initialization block:
@@ -88,7 +88,7 @@ This call will add a `_udn` variable to your initialization block:
 === Track clicks on a link ===
 
   {{{
-  string urchin_link_to(string $name, string $internalUri[, string $urchinUri[, array $options]])
+  string google_analytics_link_to(string $name, string $internalUri[, string $urchinUri[, array $options]])
   }}}
 
 You'll want to use this helper to track outbound links as well as those that go to a local file that doesn't have Google Analytics tracking code at the bottom (e.g. a PDF or image).
@@ -96,42 +96,42 @@ You'll want to use this helper to track outbound links as well as those that go 
 For example, if you want to track a link to the symfony site:
 
   {{{
-  <?php use_helper('Urchin') ?>
+  <?php use_helper('GoogleAnalytics') ?>
   
   <p>
     For more information, please visit the 
-    <?php echo urchin_link_to('symfony project site', 
-                              'http://www.symfony-project.com', 
-                              '/outbound/symfony') ?>.
+    <?php echo google_analytics_link_to('symfony project site', 
+                                        'http://www.symfony-project.com', 
+                                        '/outbound/symfony') ?>.
   </p>
   }}}
 
 Or to track downloads of a PDF:
 
   {{{
-  <?php use_helper('Urchin') ?>
+  <?php use_helper('GoogleAnalytics') ?>
   
   <p>
-    You can also download <?php echo urchin_link_to('the PDF version', 
-                                                    '/doc/the-book.pdf') ?>.
+    You can also download <?php echo google_analytics_link_to('the PDF version', 
+                                                              '/doc/the-book.pdf') ?>.
   </p>
   }}}
 
 === Track clicks on a Javascript link ===
 
   {{{
-  string urchin_link_to_function(string $name, string $function, string $urchinUri[, array $options])
+  string google_analytics_link_to_function(string $name, string $function, string $urchinUri[, array $options])
   }}}
 
 This helper function will send a call to Google Analytics when your user clicks a Javascript link. For example, if you want to track calls to a link that closes a popup window:
 
   {{{
-  <?php use_helper('Urchin') ?>
+  <?php use_helper('GoogleAnalytics') ?>
   
-  <p><?php echo urchin_link_to_function('close window', 
-                                        'window.close()', 
-                                        '/popups/mom/close', 
-                                        'id=closer') ?></p>
+  <p><?php echo google_analytics_link_to_function('close window', 
+                                                  'window.close()', 
+                                                  '/popups/mom/close', 
+                                                  'id=closer') ?></p>
   }}}
 
 === Specify where tracking code should be inserted ===
@@ -140,25 +140,26 @@ By changing the `insertion` configuration variable, you can specify where in the
 
   {{{
   prod:
-    urchin:
+    google_analytics:
       enabled:    on
   
   all:
-    urchin:
+    google_analytics:
       uacct:      xx-xxxxxxx-x
       insertion:  top
   }}}
 
 These settings will place the tracking code just inside the response's opening `<body>` tag (in the `prod` environment). The plugin defaults to placing the tracking code just before the response's closing `</body>` tag.
 
-== Roadmap ==
+== Version 1.1 Roadmap ==
 
-Support for:
-
- * `__utmLinker()`
- * `__utmLinkPost()`
+Refactor plugin to accommodate both version of Google Analytics tracking code: legacy Urchin Javascript and the new Google Javascript.
 
 == Changelog ==
+
+=== Version 1.0-RC1 ===
+
+ * Renamed plugin from sfUrchinPlugin to sfGoogleAnalyticsPlugin.
 
 === Version 0.3.1-beta ===
 

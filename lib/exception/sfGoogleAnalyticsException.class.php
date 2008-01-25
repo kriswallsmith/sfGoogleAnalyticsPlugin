@@ -1,14 +1,13 @@
 <?php
 
 /**
- * Exception class for sfUrchinPlugin.
+ * Exception class for sfGoogleAnalyticsPlugin.
  * 
- * @package     sfUrchinPlugin
+ * @package     sfGoogleAnalyticsPlugin
  * @subpackage  exception
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-class sfUrchinException extends sfException
+class sfGoogleAnalyticsException extends sfException
 {
-  
 }

@@ -5,7 +5,7 @@
  * links. Used for outbound links and downloads. Functions all produce normal
  * links when analytics is turned off in the configuration.
  * 
- * @package     sfUrchinPlugin
+ * @package     sfGoogleAnalyticsPlugin
  * @subpackage  helper
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
@@ -26,19 +26,19 @@ use_helper('Url', 'Javascript');
  * 
  * @return  string
  */
-function urchin_link_to($name, $internalUri, $urchinUri = null, $options = array())
+function google_analytics_link_to($name, $internalUri, $urchinUri = null, $options = array())
 {
-  if(sfConfig::get('app_urchin_enabled'))
+  if (sfConfig::get('app_google_analytics_enabled'))
   {
-    if(!$urchinUri)
+    if (!$urchinUri)
     {
       $urchinUri = url_for($internalUri);
     }
     
-    $newOnclick = 'urchinTracker(\'' . $urchinUri . '\');';
+    $newOnclick = 'urchinTracker(\''.$urchinUri.'\');';
     
     $options = _parse_attributes($options);
-    $options['onclick'] = isset($options['onclick']) ? ($newOnclick . $options['onclick']) : $newOnclick;
+    $options['onclick'] = isset($options['onclick']) ? ($newOnclick.$options['onclick']) : $newOnclick;
   }
 
   return link_to($name, $internalUri, $options);
@@ -54,13 +54,13 @@ function urchin_link_to($name, $internalUri, $urchinUri = null, $options = array
  * 
  * @return  string
  */
-function urchin_link_to_function($name, $function, $urchinUri, $options = array())
+function google_analytics_link_to_function($name, $function, $urchinUri, $options = array())
 {
   $link = link_to_function($name, $function, $options);
   
-  if(sfConfig::get('app_urchin_enabled')) 
+  if (sfConfig::get('app_google_analytics_enabled')) 
   {
-    $link = str_replace('onclick="', 'onclick="urchinTracker(\'' . $urchinUri . '\');', $link);
+    $link = str_replace('onclick="', 'onclick="urchinTracker(\''.$urchinUri.'\');', $link);
   }
   
   return $link;

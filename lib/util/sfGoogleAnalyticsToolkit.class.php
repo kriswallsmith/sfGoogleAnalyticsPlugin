@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Utility methods for the sfUrchinPlugin.
+ * Utility methods for the sfGoogleAnalyticsPlugin.
  * 
- * @package     sfUrchinPlugin
+ * @package     sfGoogleAnalyticsPlugin
  * @subpackage  util
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-class sfUrchinToolkit
+class sfGoogleAnalyticsToolkit
 {
   /**
    * Get HTML for insert at the bottom of a document.
    * 
    * @author  Kris Wallsmith
-   * @throws  sfUrchinException
+   * @throws  sfGoogleAnalyticsException
    * 
    * @return  string
    */
@@ -27,11 +27,11 @@ class sfUrchinToolkit
     $module  = $context->getModuleName();
     $action  = $context->getActionName();
     
-    $actionConfig = sfConfig::get('mod_'.$module.'_'.$action.'_urchin', array());
+    $actionConfig = sfConfig::get('mod_'.$module.'_'.$action.'_google_analytics', array());
     
     $usrc = $request->isSecure() ? 
-      sfConfig::get('app_urchin_usrc_ssl', 'https://ssl.google-analytics.com/urchin.js') : 
-      sfConfig::get('app_urchin_usrc', 'http://www.google-analytics.com/urchin.js');
+      sfConfig::get('app_google_analytics_usrc_ssl', 'https://ssl.google-analytics.com/urchin.js') : 
+      sfConfig::get('app_google_analytics_usrc', 'http://www.google-analytics.com/urchin.js');
     
     // initial parameter
     $utParam = '';
@@ -41,13 +41,13 @@ class sfUrchinToolkit
     }
     else
     {
-      $utParam = sfConfig::get('app_urchin_ut_param');
-      $utParam = sfConfig::get('mod_'.$module.'_urchin_ut_param', $utParam);
+      $utParam = sfConfig::get('app_google_analytics_ut_param');
+      $utParam = sfConfig::get('mod_'.$module.'_google_analytics_ut_param', $utParam);
     }
     
     // initialization variables
-    $vars = sfConfig::get('app_urchin_vars', array());
-    $vars = array_merge($vars, sfConfig::get('mod_'.$module.'_urchin_vars', array()));
+    $vars = sfConfig::get('app_google_analytics_vars', array());
+    $vars = array_merge($vars, sfConfig::get('mod_'.$module.'_google_analytics_vars', array()));
     if (isset($actionConfig['vars']) && is_array($actionConfig['vars']))
     {
       $vars = array_merge($vars, $actionConfig['vars']);
@@ -57,10 +57,10 @@ class sfUrchinToolkit
     if (!isset($vars['uacct']) && !isset($vars['_uacct']))
     {
       // backwards compatibility
-      $vars['uacct'] = sfConfig::get('app_urchin_uacct');
+      $vars['uacct'] = sfConfig::get('app_google_analytics_uacct');
       if (!$vars['uacct'])
       {
-        throw new sfUrchinException('Please add your Urchin account number to your app.yml.');
+        throw new sfGoogleAnalyticsException('Please add your Google Analytics account number to your app.yml.');
       }
     }
     
