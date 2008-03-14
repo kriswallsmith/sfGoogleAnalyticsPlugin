@@ -65,3 +65,14 @@ function google_analytics_link_to_function($name, $function, $urchinUri, $option
   
   return $link;
 }
+
+/**
+ * Add a custom variable to the tracking code.
+ * 
+ * @author  Kris Wallsmith
+ * @param   string $var
+ */
+function google_analytics_custom_var($var)
+{
+  sfGoogleAnalyticsToolkit::addCustomVar($var);
+}

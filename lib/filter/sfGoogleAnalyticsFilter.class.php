@@ -28,11 +28,17 @@ class sfGoogleAnalyticsFilter extends sfFilter
    * Insert tracking code for applicable web requests.
    * 
    * @author  Kris Wallsmith
-   * 
    * @param   sfFilterChain $filterChain
    */
   public function execute($filterChain)
   {
+    if ($this->isTrackable())
+    {
+      // capture custom vars stored to flash on the way up the filter chain
+      // since they'll have been removed already on the way down
+      sfGoogleAnalyticsToolkit::addCustomVars($this->getContext()->getUser()->getAttributeHolder()->get('google_analytics_custom_vars', array(), 'symfony/flash'));
+    }
+    
     $filterChain->execute();
     
     if ($this->isTrackable())
@@ -65,7 +71,6 @@ class sfGoogleAnalyticsFilter extends sfFilter
    * Test whether tracking code should be inserted for this request.
    * 
    * @author  Kris Wallsmith
-   * 
    * @return  bool
    */
   protected function isTrackable()
@@ -101,7 +106,6 @@ class sfGoogleAnalyticsFilter extends sfFilter
    * Insert supplied tracking code at the top of the body tag.
    * 
    * @author  Kris Wallsmith
-   * 
    * @param   string $trackingCode
    */
   protected function insertTrackingCodeTop($trackingCode)
@@ -123,7 +127,6 @@ class sfGoogleAnalyticsFilter extends sfFilter
    * Insert supplied tracking code at the bottom of the body tag.
    * 
    * @author  Kris Wallsmith
-   * 
    * @param   string $trackingCode
    */
   protected function insertTrackingCodeBottom($trackingCode)
@@ -145,7 +148,6 @@ class sfGoogleAnalyticsFilter extends sfFilter
    * Get tracking code for insertion.
    *
    * @author  Kris Wallsmith
-   * 
    * @return  string
    */
   protected function generateTrackingCode()

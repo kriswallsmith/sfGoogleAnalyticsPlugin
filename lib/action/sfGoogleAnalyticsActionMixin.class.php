@@ -14,43 +14,51 @@ class sfGoogleAnalyticsActionMixin
    * Set a custom parameter for Google Analytics initialization.
    * 
    * @author  Kris Wallsmith
-   * 
    * @param   sfComponent $action
    * @param   string $utParam
    */
   public static function setGoogleAnalyticsParam($action, $utParam)
   {
-    $moduleName = $action->getModuleName();
-    $actionName = $action->getActionName();
-    
-    $actionConfig = sfConfig::get('mod_'.$moduleName.'_'.$actionName.'_google_analytics', array());
-    $actionConfig['ut_param'] = $utParam;
-    
-    sfConfig::set('mod_'.$moduleName.'_'.$actionName.'_google_analytics', $actionConfig);
+    sfGoogleAnalyticsToolkit::setParam($utParam);
   }
   
   /**
    * Add a Google Analytics initialization variable.
    * 
    * @author  Kris Wallsmith
-   * 
    * @param   sfComponent $action
    * @param   string $name
    * @param   string $value
    */
   public static function addGoogleAnalyticsVar($action, $name, $value)
   {
-    $moduleName = $action->getModuleName();
-    $actionName = $action->getActionName();
-    
-    $actionConfig = sfConfig::get('mod_'.$moduleName.'_'.$actionName.'_google_analytics', array());
-    if (!isset($actionConfig['vars']))
-    {
-      $actionConfig['vars'] = array();
-    }
-    $actionConfig['vars'][$name] = $value;
-    
-    sfConfig::set('mod_'.$moduleName.'_'.$actionName.'_google_analytics', $actionConfig);
+    sfGoogleAnalyticsToolkit::addVar($name, $value);
+  }
+  
+  /**
+   * Add a custom variable to Google Analytics.
+   * 
+   * @author  Kris Wallsmith
+   * @param   sfComponent $action
+   * @param   string $var
+   */
+  public static function addGoogleAnalyticsCustomVar($action, $var)
+  {
+    sfGoogleAnalyticsToolkit::addCustomVar($var);
+  }
+  
+  /**
+   * Add a custom variable that will render on the next request.
+   * 
+   * @author  Kris Wallsmith
+   * @param   sfComponent $action
+   * @param   string $var
+   */
+  public static function addGoogleAnalyticsCustomVarToFlash($action, $var)
+  {
+    $vars = $action->getFlash('google_analytics_custom_vars', array());
+    $vars[] = $var;
+    $action->setFlash('google_analytics_custom_vars', $vars);
   }
   
 }
