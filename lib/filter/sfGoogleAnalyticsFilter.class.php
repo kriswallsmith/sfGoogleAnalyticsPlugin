@@ -113,7 +113,7 @@ class sfGoogleAnalyticsFilter extends sfFilter
     $response = $this->getContext()->getResponse();
     
     $oldContent = $response->getContent();
-    $newContent = preg_replace('/\<body[^\>]*\>/i', "$0".$trackingCode, $oldContent, 1);
+    $newContent = preg_replace('/\<body[^\>]*\>/i', "$0\n".$trackingCode, $oldContent, 1);
     
     if ($oldContent == $newContent)
     {
@@ -134,7 +134,7 @@ class sfGoogleAnalyticsFilter extends sfFilter
     $response = $this->getContext()->getResponse();
     
     $oldContent = $response->getContent();
-    $newContent = str_ireplace('</body>', $trackingCode.'</body>', $oldContent);
+    $newContent = str_ireplace('</body>', $trackingCode."\n</body>", $oldContent);
     
     if ($oldContent == $newContent)
     {

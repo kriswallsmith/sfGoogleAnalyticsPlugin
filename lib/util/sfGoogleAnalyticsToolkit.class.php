@@ -19,86 +19,63 @@ class sfGoogleAnalyticsToolkit
    */
   public static function getHtml()
   {
-    sfLoader::loadHelpers(array('Escaping', 'Asset'));
+    sfLoader::loadHelpers(array('Partial'));
     
-    $context = sfContext::getInstance();
-    $request = $context->getRequest();
-    $module  = $context->getModuleName();
-    $action  = $context->getActionName();
-    
-    $actionConfig = sfConfig::get('mod_'.$module.'_'.$action.'_google_analytics', array());
-    
-    $usrc = $request->isSecure() ? 
+    $usrc = sfContext::getInstance()->getRequest()->isSecure() ? 
       sfConfig::get('app_google_analytics_usrc_ssl', 'https://ssl.google-analytics.com/urchin.js') : 
       sfConfig::get('app_google_analytics_usrc', 'http://www.google-analytics.com/urchin.js');
     
-    // initial parameter
-    $utParam = '';
-    if (isset($actionConfig['ut_param']))
-    {
-      $utParam = $actionConfig['ut_param'];
-    }
-    else
-    {
-      $utParam = sfConfig::get('app_google_analytics_ut_param');
-      $utParam = sfConfig::get('mod_'.$module.'_google_analytics_ut_param', $utParam);
-    }
-    
-    // initialization variables
-    $vars = sfConfig::get('app_google_analytics_vars', array());
-    $vars = array_merge($vars, sfConfig::get('mod_'.$module.'_google_analytics_vars', array()));
-    if (isset($actionConfig['vars']) && is_array($actionConfig['vars']))
-    {
-      $vars = array_merge($vars, $actionConfig['vars']);
-    }
-    
-    // account number is required
-    if (!isset($vars['uacct']) && !isset($vars['_uacct']))
+    // capture and prepare all javascript variable to be declared before the
+    // initial call to urchinTracker() - confirm we have a value for _uacct.
+    $varsConfig = self::getFinalConfigValue('vars', true);
+    if (!isset($varsConfig['uacct']) && !isset($varsConfig['_uacct']))
     {
       // backwards compatibility
-      $vars['uacct'] = sfConfig::get('app_google_analytics_uacct');
-      if (!$vars['uacct'])
+      $varsConfig['uacct'] = sfConfig::get('app_google_analytics_uacct');
+      if (!$varsConfig['uacct'])
       {
         throw new sfGoogleAnalyticsException('Please add your Google Analytics account number to your app.yml.');
       }
     }
-    
-    // prep the initial parameter
-    if ($utParam)
-    {
-      $utParam = sprintf('"%s"', esc_js_no_entities($utParam));
-      $utParam = str_replace('\\/', '/', $utParam);
-    }
-    
-    // build initialization variables
-    $jsVars = array();
-    foreach ($vars as $key => $value)
+    $vars = array();
+    foreach ($varsConfig as $key => $value)
     {
       if ($key{0} != '_')
       {
         $key = '_'.$key;
       }
-      $jsVars[] = sprintf("%s=\"%s\";", $key, esc_js_no_entities($value));
+      $vars[] = $key.'='.self::escape($value);
     }
-    $jsVars = join("\n", $jsVars);
     
-    // custom variables
-    $custom = sfConfig::get('app_google_analytics_custom', array());
-    $custom = array_merge($custom, sfConfig::get('mod_'.$module.'_google_analytics_custom', array()));
-    if (isset($actionConfig['custom']) && is_array($actionConfig['custom']))
+    // capture and prepare the parameter for the initial call to urchinTracker()
+    $utParam = self::getFinalConfigValue('ut_param');
+    if ($utParam)
     {
-      $custom = array_merge($custom, $actionConfig['custom']);
+      $utParam = self::escape($utParam);
     }
     
-    $jsCustom = array();
-    foreach ($custom as $value)
+    // capture and prepare any custom tracking variables that have been 
+    // configured for this response.
+    $customConfig = self::getFinalConfigValue('custom', true);
+    $custom = array();
+    foreach ($customConfig as $value)
     {
-      $jsCustom[] = sprintf('__utmSetVar("%s");', esc_js_no_entities($value));
+      $custom[] = sprintf('__utmSetVar(%s);', self::escape($value));
     }
-    $jsCustom = join("\n", $jsCustom);
     
-    $html  = javascript_include_tag($usrc);
-    $html .= javascript_tag(sprintf("%s\nurchinTracker(%s);\n%s", $jsVars, $utParam, $jsCustom));
+    // build the html block for insertion
+    $html   = array('');
+    $html[] = sprintf('<script type="text/javascript" src="%s"></script>', $usrc);
+    $html[] = '<script type="text/javascript">';
+    $html[] = get_slot('google_analytics_top');
+    $html[] = join("\n", $vars);
+    $html[] = sprintf('urchinTracker(%s);', $utParam);
+    $html[] = join("\n", $custom);
+    $html[] = get_slot('google_analytics_bottom');
+    $html[] = '</script>';
+    
+    $html = array_unique($html);
+    $html = join("\n", array_slice($html, 1));
     
     return $html;
   }
@@ -171,6 +148,62 @@ class sfGoogleAnalyticsToolkit
   //------------------------------------------------------------------------//
   // INTERNAL UTILITIES
   //------------------------------------------------------------------------//
+  
+  /**
+   * Escape a string value for Javascript.
+   * 
+   * This method will use the JSON extension if it is available.
+   * 
+   * @author  Kris Wallsmith
+   * @param   string $value
+   * @return  string
+   */
+  protected static function escape($value)
+  {
+    if (function_exists('json_encode'))
+    {
+      $escaped = json_encode($value);
+    }
+    else
+    {
+      sfLoader::loadHelpers(array('Escaping'));
+      $escaped = '"'.esc_js($value).'"';
+    }
+    
+    return $escaped;
+  }
+  
+  /**
+   * Get a configuration value.
+   * 
+   * Checks application, module and action-level configuration.
+   * 
+   * @author  Kris Wallsmith
+   * @param   string $key
+   * @param   bool $merge - treat value as array and merge configs
+   * @return  mixed
+   */
+  protected static function getFinalConfigValue($key, $merge = false)
+  {
+    $module = sfContext::getInstance()->getModuleName();
+    
+    $actionConfig = self::getActionConfig();
+    $actionConfig = isset($actionConfig[$key]) ? $actionConfig[$key] : null;
+    
+    $moduleConfig = sfConfig::get('mod_'.$module.'_google_analytics_'.$key);
+    $appConfig = sfConfig::get('app_google_analytics_'.$key);
+    
+    if ($merge)
+    {
+      $value = array_merge((array) $appConfig, (array) $moduleConfig, (array) $actionConfig);
+    }
+    else
+    {
+      $value = $actionConfig ? $actionConfig : ($moduleConfig ? $moduleConfig : $appConfig);
+    }
+    
+    return $value;
+  }
   
   /**
    * Get the Google Analytics configuration for the current action.

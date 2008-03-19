@@ -17,7 +17,7 @@ class sfGoogleAnalyticsActionMixin
    * @param   sfComponent $action
    * @param   string $utParam
    */
-  public static function setGoogleAnalyticsParam($action, $utParam)
+  public static function setGoogleAnalyticsParam(sfComponent $action, $utParam)
   {
     sfGoogleAnalyticsToolkit::setParam($utParam);
   }
@@ -30,7 +30,7 @@ class sfGoogleAnalyticsActionMixin
    * @param   string $name
    * @param   string $value
    */
-  public static function addGoogleAnalyticsVar($action, $name, $value)
+  public static function addGoogleAnalyticsVar(sfComponent $action, $name, $value)
   {
     sfGoogleAnalyticsToolkit::addVar($name, $value);
   }
@@ -42,7 +42,7 @@ class sfGoogleAnalyticsActionMixin
    * @param   sfComponent $action
    * @param   string $var
    */
-  public static function addGoogleAnalyticsCustomVar($action, $var)
+  public static function addGoogleAnalyticsCustomVar(sfComponent $action, $var)
   {
     sfGoogleAnalyticsToolkit::addCustomVar($var);
   }
@@ -53,12 +53,15 @@ class sfGoogleAnalyticsActionMixin
    * @author  Kris Wallsmith
    * @param   sfComponent $action
    * @param   string $var
+   * @param   bool $persist
+   * @see     comment block for sfGoogleAnalyticsUserMixin::addGoogleAnalyticsCustomVarToFlash()
+   * @todo    support updated symfony 1.1 flash architecture
    */
-  public static function addGoogleAnalyticsCustomVarToFlash($action, $var)
+  public static function addGoogleAnalyticsCustomVarToFlash(sfComponent $action, $var, $persist = true)
   {
     $vars = $action->getFlash('google_analytics_custom_vars', array());
     $vars[] = $var;
-    $action->setFlash('google_analytics_custom_vars', $vars);
+    $action->setFlash('google_analytics_custom_vars', $vars, $persist);
   }
   
 }
