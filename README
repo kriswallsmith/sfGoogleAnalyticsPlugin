@@ -15,7 +15,13 @@ Easily adds tracking code for [http://www.google.com/analytics Google Analytics]
   {{{
   ./symfony plugin-install http://plugins.symfony-project.com/sfGoogleAnalyticsPlugin
   }}}
- 
+
+ If you use Subversion to install your plugins, please connect to the 1.0 branch at the following URL. Development for [#Version1.1Roadmap version 1.1] of this plugin has begun in the trunk, which is now unstable.
+
+  {{{
+  http://svn.symfony-project.com/plugins/sfGoogleAnalyticsPlugin/branches/1.0
+  }}}
+
  * Configure your Google Analytics account in `app.yml`:
  
   {{{
