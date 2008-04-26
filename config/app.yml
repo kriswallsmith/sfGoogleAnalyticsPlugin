@@ -1,18 +1,33 @@
 # all:
-#   google_analytics:
-#     enabled:      off
-#     uacct:        ~       # Profile number
-#     insertion:    bottom  # Where to insert the tracking code (top or bottom)
-#     vars:                 # Custom init variables     - http://www.google.com/support/googleanalytics/bin/answer.py?answer=75129
-#       udn:        ~       # Set a custom domain name  - http://www.google.com/support/googleanalytics/bin/answer.py?answer=75129
-#       uccn:       ~       # Custom campaign variable  - http://www.google.com/support/googleanalytics/bin/answer.py?answer=75768
-#       ucsr:       ~       # Custom source variable
-#       ucmd:       ~       # Custom medium variable
-#       uctr:       ~       # Custom term variable
-#       ucct:       ~       # Custom content variable
-#       ulink:      ~       # Linker functionality      - http://www.google.com/support/googleanalytics/bin/answer.py?answer=74986
-#       utimeout:   ~       # Inactive timeout          - http://www.google.com/support/googleanalytics/bin/answer.py?answer=74927
-#       userv:      ~       # Urchin server             - http://www.google.com/support/googleanalytics/bin/answer.py?answer=74937
-#     custom:       []      # For __utmSetVar()         - http://www.google.com/support/googleanalytics/bin/answer.py?answer=75010
-#     usrc:         http://www.google-analytics.com/urchin.js
-#     usrc_ssl:     https://ssl.google-analytics.com/urchin.js
+#   sf_google_analytics_plugin:
+#     enabled:    off
+#     profile_id: XX-XXXXX-X
+#     insertion:  bottom
+#     tracker:    urchin
+#     classes:
+#       urchin:   sfGoogleAnalyticsTrackerUrchin
+#       google:   sfGoogleAnalyticsTrackerGoogle
+# 
+#     # tracker configuration, all optional
+#     params:
+#       page_name:                  ~         # this setting should be used in module.yml, not app.yml
+#       domain_name:                ~
+#       linker_policy:              off
+#       organic_referers:           [{ name: ~, param: ~ }]
+#       vars:                       []        # this setting also makes more sense to use in module.yml, not app.yml
+#       cookie_path:                /
+#       client_info_policy:         on
+#       hash_policy:                on
+#       detect_flash_policy:        on
+#       detect_title_policy:        on
+#       session_timeout:            3600      # 30 minutes
+#       cookie_timeout:             31536000  # six months
+#       campaign_keys:              { name: ~, source: ~, medium: ~, term: ~, content: ~, id: ~, no_override: ~ }
+#       anchor_policy:              off
+#       ignored_organics:           []
+#       ignored_referers:           []
+#       sample_rate:                100       # 100%
+#       local_remote_server_policy: off
+# 
+#       # specific to "google" tracker
+#       tracker_var:                pageTracker

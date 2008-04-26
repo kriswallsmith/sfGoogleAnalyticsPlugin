@@ -2,22 +2,22 @@
 <package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.1" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
   <name>sfGoogleAnalyticsPlugin</name>
   <channel>pear.symfony-project.com</channel>
-  <summary>Easily add Google Analytics.</summary>
-  <description>Easily add Google Analytics.</description>
+  <summary>Easily add Google Analytics to your symfony project.</summary>
+  <description>Easily add Google Analytics to your symfony project.</description>
   <lead>
     <name>Kris Wallsmith</name>
     <user>Kris.Wallsmith</user>
     <email>kris.wallsmith@gmail.com</email>
     <active>yes</active>
   </lead>
-  <date>2008-03-19</date>
+  <date>2008-04-26</date>
   <version>
-    <release>1.0.0</release>
-    <api>1.0.0</api>
+    <release>1.1.0</release>
+    <api>1.1.0</api>
   </version>
   <stability>
-    <release>beta</release>
-    <api>beta</api>
+    <release>stable</release>
+    <api>stable</api>
   </stability>
   <license uri="http://www.symfony-project.com/license">MIT license</license>
   <notes>-</notes>
@@ -26,25 +26,29 @@
       <dir name="config">
         <file role="data" name="app.yml"/>
         <file role="data" name="config.php"/>
+        <file role="data" name="module.yml"/>
       </dir>
       <dir name="lib">
-        <dir name="action">
-          <file role="data" name="sfGoogleAnalyticsActionMixin.class.php"/>
-        </dir>
-        <dir name="exception">
-          <file role="data" name="sfGoogleAnalyticsException.class.php"/>
-        </dir>
         <dir name="filter">
           <file role="data" name="sfGoogleAnalyticsFilter.class.php"/>
         </dir>
         <dir name="helper">
           <file role="data" name="GoogleAnalyticsHelper.php"/>
         </dir>
-        <dir name="user">
-          <file role="data" name="sfGoogleAnalyticsUserMixin.class.php"/>
+        <dir name="listener">
+          <file role="data" name="sfGoogleAnalyticsListener.class.php"/>
         </dir>
-        <dir name="util">
-          <file role="data" name="sfGoogleAnalyticsToolkit.class.php"/>
+        <dir name="mixin">
+          <file role="data" name="sfGoogleAnalyticsMixin.class.php"/>
+        </dir>
+        <dir name="tracker">
+          <file role="data" name="sfGoogleAnalyticsTracker.class.php"/>
+          <file role="data" name="sfGoogleAnalyticsTrackerGoogle.class.php"/>
+          <file role="data" name="sfGoogleAnalyticsTrackerUrchin.class.php"/>
+        </dir>
+        <dir name="transaction">
+          <file role="data" name="sfGoogleAnalyticsItem.class.php"/>
+          <file role="data" name="sfGoogleAnalyticsTransaction.class.php"/>
         </dir>
       </dir>
       <file role="data" name="LICENSE"/>
@@ -64,12 +68,9 @@
         <channel>pear.symfony-project.com</channel>
         <min>1.0.0</min>
         <max>1.1.0</max>
-        <exclude>1.1.0</exclude>
       </package>
     </required>
   </dependencies>
-  <phprelease>
- </phprelease>
-  <changelog>
- </changelog>
+  <phprelease></phprelease>
+  <changelog></changelog>
 </package>

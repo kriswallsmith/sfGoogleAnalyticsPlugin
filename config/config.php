@@ -1,8 +1,30 @@
 <?php
 
-sfMixer::register('sfComponent', array('sfGoogleAnalyticsActionMixin', 'setGoogleAnalyticsParam'));
-sfMixer::register('sfComponent', array('sfGoogleAnalyticsActionMixin', 'addGoogleAnalyticsVar'));
-sfMixer::register('sfComponent', array('sfGoogleAnalyticsActionMixin', 'addGoogleAnalyticsCustomVar'));
-sfMixer::register('sfComponent', array('sfGoogleAnalyticsActionMixin', 'addGoogleAnalyticsCustomVarToFlash'));
-
-sfMixer::register('sfUser', array('sfGoogleAnalyticsUserMixin', 'addGoogleAnalyticsCustomVarToFlash'));
+if (defined('SYMFONY_VERSION') && strpos(SYMFONY_VERSION, '1.1') === 0)
+{
+  // symfony 1.1
+  $listener = array('sfGoogleAnalyticsListener', 'observe');
+  
+  $this->dispatcher->connect('request.method_not_found', $listener);
+  $this->dispatcher->connect('response.method_not_found', $listener);
+  $this->dispatcher->connect('component.method_not_found', $listener);
+  $this->dispatcher->connect('user.method_not_found', $listener);
+}
+else
+{
+  // symfony 1.0
+  $getter = array('sfGoogleAnalyticsMixin', 'getTracker');
+  $setter = array('sfGoogleAnalyticsMixin', 'setTracker');
+  
+  sfMixer::register('sfRequest', $getter);
+  sfMixer::register('sfRequest', $setter);
+  
+  sfMixer::register('sfResponse', $getter);
+  sfMixer::register('sfResponse', $setter);
+  
+  sfMixer::register('sfComponent', $getter);
+  sfMixer::register('sfComponent', $setter);
+  
+  sfMixer::register('sfUser', $getter);
+  sfMixer::register('sfUser', $setter);
+}
