@@ -166,11 +166,11 @@ class sfGoogleAnalyticsTrackerGoogle extends sfGoogleAnalyticsTracker
     
     if ($pageName = $this->getPageName())
     {
-      $html[] = sprintf('%s._trackPageView(%s);', $tracker, $this->escape($pageName));
+      $html[] = sprintf('%s._trackPageview(%s);', $tracker, $this->escape($pageName));
     }
     else
     {
-      $html[] = sprintf('%s._trackPageView();', $tracker);
+      $html[] = sprintf('%s._trackPageview();', $tracker);
     }
     
     foreach ($this->getVars() as $var)
