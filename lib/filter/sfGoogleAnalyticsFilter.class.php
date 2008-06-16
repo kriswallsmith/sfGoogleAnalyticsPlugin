@@ -63,14 +63,14 @@ class sfGoogleAnalyticsFilter extends sfFilter
     {
       if (sfConfig::get('sf_logging_enabled'))
       {
-        $this->log('Inserting tracking code.');
+        sfGoogleAnalyticsToolkit::logMessage($this, 'Inserting tracking code.');
       }
       
       $tracker->insert($response);
     }
     elseif (sfConfig::get('sf_logging_enabled'))
     {
-      $this->log('Tracking code not inserted.');
+      sfGoogleAnalyticsToolkit::logMessage($this, 'Tracking code not inserted.');
     }
     
     $user->getAttributeHolder()->removeNamespace('sf_google_analytics_plugin');
@@ -107,22 +107,4 @@ class sfGoogleAnalyticsFilter extends sfFilter
       return true;
     }
   }
-  
-  /**
-   * Log a message.
-   * 
-   * @param   string $message
-   */
-  protected function log($message)
-  {
-    if (defined('SYMFONY_VERSION') && strpos(SYMFONY_VERSION, '1.1') === 0)
-    {
-      $this->context->getEventDispatcher()->notify(new sfEvent(null, 'application.log', array($message)));
-    }
-    else
-    {
-      $this->getContext()->getLogger()->info(sprintf('{%s} %s', __CLASS__, $message));
-    }
-  }
-  
 }

@@ -1,14 +1,245 @@
 = sfGoogleAnalyticsPlugin plugin =
 
-Easily adds tracking code for [http://www.google.com/analytics Google Analytics] to your presentation layer.
+Easily add [http://www.google.com/analytics Google Analytics] tracking code to your presentation layer.
 
-Documentation for the new 1.1 plugin is forthcoming.
+''This documentation is a work in progress. Thank you for your patience.''
+
+== Installation ==
+
+=== 1. Install ===
+
+You can install using the `plugin-install` task:
+
+{{{
+php symfony plugin-install sfGoogleAnalyticsPlugin
+}}}
+
+You can also pull the code directly from the [http://svn.symfony-project.org/plugins/sfGoogleAnalyticsPlugin/trunk Subversion repository] using a `svn checkout` or the `svn:externals` property on your project's `/plugins` directory.
+
+Once the plugin code is accessible to your project, you need to add the `sfGoogleAnalyticsFilter` to your filter chain:
+
+{{{
+#!yaml
+rendering: ~
+security:  ~
+
+# insert your own filters here
+sf_google_analytics_plugin:
+  class: sfGoogleAnalyticsFilter
+
+cache:     ~
+common:    ~
+execution: ~
+}}}
+
+''NOTE: This is the symfony 1.1 `filters.yml` file. The equivalent symfony 1.0 file looks slightly different.''
+
+=== 2. Configure ===
+
+Basic configuration is done in your application's `app.yml` file:
+
+{{{
+#!yaml
+all:
+  sf_google_analytics_plugin:
+    enabled:      on
+    profile_id:   XX-XXXXX-X
+    tracker:      google
+}}}
+
+You'll have to copy the `profile_id` value out of the tracking code Google supplies for your site profile. This value typically starts with the letter U and ends with a single digit.
+
+This plugin defaults to using the older `urchin` tracker. To take advantage of the latest featureset of Google Analytics, change the `tracker` value to `google`. This will insert the new `ga.js` tracking code into your project.
+
+== Advanced Usage ==
+
+This plugin provides much more functionality than a simple insert of your tracking code. Here are some highlights:
+
+=== How do I customize the name a page is tracked as? ===
+
+If you would like to track a certain page as something other than what appears in the browser address bar, you can do so by modifying the `page_name` parameter in `module.yml`:
+
+{{{
+#!yaml
+all:
+  myAction:
+    sf_google_analytics_plugin:
+      params:
+        page_name: something_else
+}}}
+
+For finer control over when the alternate page name is used, you can access the tracker object directly in your action. This also exposes additional funcionality. 
+
+==== Option: `use_flash` ====
+
+For example, if you want to track a successful form submission for a form that redirects to the same page on success and on error:
+
+{{{
+#!php
+<?php
+
+class mainActions extends sfActions
+{
+  public function executeContact()
+  {
+    // form submission logic...
+
+    if ($success)
+    {
+      $this->getTracker()->setPageName('/contact/success', array(
+        'use_flash' => true,
+      ));
+
+      $this->setFlash('feedback', 'Thank you!');
+
+      $this->redirect('main/contact');
+    }
+  }
+}
+}}}
+
+In this example, the request after the successful form post will be tracked as `/contact/success`.
+
+==== Option: `is_route` ====
+
+One more option available is the `is_route` option. When this flag is applied, the string provided for a page name will be passed through `sfRouting` before being added to the page. Using this option allows you to centralize all URLs, those real and for tracking purposes only, in your application's `routing.yml` file:
+
+{{{
+#!yaml
+contact:
+  url:    /contact
+  param:  { module: main, action: contact }
+
+# be sure the tracking rule comes AFTER the real rule so the application 
+# doesn't use it for any url_for('main/contact') calls
+track_contact:
+  url:    /contact/success
+  param:  { module: main, action: contact }
+}}}
+
+{{{
+#!php
+<?php
+
+class mainActions extends sfActions
+{
+  public function executeContact()
+  {
+    // form submission logic...
+
+    if ($success)
+    {
+      $this->getTracker()->setPageName('@track_contact', array(
+        'use_flash' => true,
+        'is_route'  => true,
+      ));
+
+      $this->setFlash('feedback', 'Thank you!');
+
+      $this->redirect('@contact');
+    }
+  }
+}
+}}}
+
+=== How do I selectively disable tracking? ===
+
+You can easily configure the tracking code for a single module or even a single action by using the `module.yml` configuration file:
+
+{{{
+#!yaml
+all:
+  # disable tracking for this module...
+  sf_google_analytics_plugin:
+    params:
+      enabled off
+  
+  # ...or for a single action
+  index:
+    sf_google_analytics_plugin:
+      params:
+        enabled off
+}}}
+
+Alternatively, you can access the tracker object directly from inside your action:
+
+{{{
+#!php
+<?php
+
+class mainActions extends sfActions
+{
+  public function executeIndex()
+  {
+    $this->getTracker()->setEnabled(false);
+  }
+}
+}}}
+
+=== Can I insert the tracking code at the top of my page? ===
+
+You can configure this in `app.yml`:
+
+{{{
+#!yaml
+all:
+  sf_google_analytics_plugin:
+    profile_id:   XX-XXXXX-X
+    insertion:    top
+}}}
+
+=== Can I track demographic information? ===
+
+You can expose whatever information you store on your users (that your privacy policy allows, of course) to Google Analytics. This is best done in your sign-in routine. For example, if you're using [wiki:sfGuardPlugin]:
+
+{{{
+#!php
+<?php
+
+class myUser extends sfGuardSecurityUser
+{
+  /**
+   * Overload to add custom tracking variables to the current user.
+   * 
+   * Variables are added using flash, assuming sign in will be followed by a 
+   * redirect.
+   * 
+   * @see sfGuardSecurityUser
+   */
+  public function signIn($user, $remember = false, $con = null)
+  {
+    parent::signIn($user, $remember, $con);
+
+    // assign tracking variables
+    if ($gender = $user->getProfile()->getGender())
+    {
+      $this->getTracker()->setVar('gender/'.$gender, array(
+        'use_flash' => true,
+      ));
+    }
+    if ($this->hasCredential('moderator'))
+    {
+      $this->getTracker()->setVar('userType/moderator', array(
+        'use_flash' => true,
+      ));
+    }
+  }
+}
+}}}
 
 == Changelog ==
 
-=== Version 1.1.0-devel ==
+=== Version 1.1.2 ===
 
- * Added support for new Google Javascript library (`ga.js`).
+ * Fixed symfony 1.1 compatibility in `sfLogger` interactions.
+
+=== Version 1.1.1 ===
+
+ * Fixed Javascript case-sensitivity bug.
+
+=== Version 1.1.0 ===
+
+ * '''Added support for new Google Javascript library (`ga.js`).'''
  * Updated API to include more human-readable method names.
  * Added support for tracking e-commerce transactions.
  * Added option to parse tracking argument with `sfRouting`.
@@ -40,3 +271,4 @@ Documentation for the new 1.1 plugin is forthcoming.
 == Maintainers ==
 
 Kris Wallsmith
+

@@ -208,7 +208,6 @@ function _check_linker_settings(sfGoogleAnalyticsTracker $tracker)
 {
   if ($tracker->getDomainName() !== 'none' || $tracker->getLinkerPolicy() !== true)
   {
-    // a friendly note...
-    sfContext::getInstance()->getLogger()->notice('{%s} If tracking multiple domain names on one profile, the app.yml "domain_name" setting should be "off" and the "linker_policy" setting should be "on".', basename(__FILE__));
+    sfGoogleAnalyticsToolkit::logMessage(basename(__FILE__), 'If tracking multiple domain names on one profile, the app.yml "domain_name" setting should be "off" and the "linker_policy" setting should be "on".', 'notice');
   }
 }

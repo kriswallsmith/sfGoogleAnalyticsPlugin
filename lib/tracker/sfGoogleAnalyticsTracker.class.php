@@ -895,7 +895,7 @@ abstract class sfGoogleAnalyticsTracker
   {
     if (sfConfig::get('sf_logging_enabled'))
     {
-      $this->context->getLogger()->info(sprintf('{%s} Storing call to %s method for next response.', __CLASS__, $method));
+      sfGoogleAnalyticsToolkit::logMessage($this, 'Storing call to %s method for next response.');
     }
     
     $callables = $this->parameterHolder->getAll('flash', array());
@@ -936,7 +936,7 @@ abstract class sfGoogleAnalyticsTracker
   {
     if (sfConfig::get('sf_logging_enabled'))
     {
-      $this->context->getLogger()->info(sprintf('{%s} Copying callables to session storage.', __CLASS__));
+      sfGoogleAnalyticsToolkit::logMessage($this, 'Copying callables to session storage.');
     }
     
     $user->getAttributeHolder()->set('callables', $this->parameterHolder->getAll('flash', array()), 'sf_google_analytics_plugin');
