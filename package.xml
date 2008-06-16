@@ -50,9 +50,9 @@
           <file role="data" name="sfGoogleAnalyticsItem.class.php"/>
           <file role="data" name="sfGoogleAnalyticsTransaction.class.php"/>
         </dir>
-        <div name="util">
+        <dir name="util">
           <file role="data" name="sfGoogleAnalyticsToolkit.class.php"/>
-        </div>
+        </dir>
       </dir>
       <file role="data" name="LICENSE"/>
       <file role="data" name="README"/>
