@@ -26,7 +26,7 @@ class sfGoogleAnalyticsToolkit
     else
     {
       $message = sprintf('{%s} %s', is_object($subject) ? get_class($subject) : $subject, $message);
-      sfContext::getInstance()->getLogger()->log($message, $priority);
+      sfContext::getInstance()->getLogger()->log($message, constant('SF_LOG_'.strtoupper($priority)));
     }
   }
 }
