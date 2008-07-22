@@ -25,7 +25,7 @@ class sfGoogleAnalyticsToolkit
     {
       ProjectConfiguration::getActive()->getEventDispatcher()->notify(new sfEvent($subject, 'application.log', array($message, 'priority' => $priority ? constant('sfLogger::'.$priority) : sfLogger::INFO)));
     }
-    else
+    elseif ($priority)
     {
       $message = sprintf('{%s} %s', is_object($subject) ? get_class($subject) : $subject, $message);
       sfContext::getInstance()->getLogger()->log($message, constant('SF_LOG_'.$priority));
