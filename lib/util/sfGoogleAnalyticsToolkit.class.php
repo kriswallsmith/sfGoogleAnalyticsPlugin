@@ -5,7 +5,7 @@
  * 
  * @package     sfGoogleAnalyticsPlugin
  * @subpackage  util
- * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
+ * @author      Kris Wallsmith <kris.wallsmith@symfony-project.com>
  * @version     SVN: $Id$
  */
 class sfGoogleAnalyticsToolkit
