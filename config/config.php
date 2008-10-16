@@ -1,8 +1,8 @@
 <?php
 
-if (defined('SYMFONY_VERSION') && strpos(SYMFONY_VERSION, '1.1') === 0)
+if (defined('SYMFONY_VERSION') && 0 !== strpos(SYMFONY_VERSION, '1.0'))
 {
-  // symfony 1.1
+  // >= symfony 1.1
   $listener = array('sfGoogleAnalyticsListener', 'observe');
   
   $this->dispatcher->connect('request.method_not_found', $listener);
