@@ -49,10 +49,10 @@ class sfGoogleAnalyticsFilter extends sfFilter
     $module = $this->context->getModuleName();
     $action = $this->context->getActionName();
     
-    $moduleParams = sfConfig::get('mod_'.$module.'_sf_google_analytics_plugin_params', array());
+    $moduleParams = sfConfig::get('mod_'.strtolower($module).'_sf_google_analytics_plugin_params', array());
     $tracker->configure($moduleParams);
     
-    $actionConfig = sfConfig::get('mod_'.$module.'_'.$action.'_sf_google_analytics_plugin', array());
+    $actionConfig = sfConfig::get('mod_'.strtolower($module).'_'.$action.'_sf_google_analytics_plugin', array());
     if (isset($actionConfig['params']))
     {
       $tracker->configure($actionConfig['params']);
