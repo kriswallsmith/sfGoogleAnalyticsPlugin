@@ -45,6 +45,7 @@
           <file role="data" name="sfGoogleAnalyticsTracker.class.php"/>
           <file role="data" name="sfGoogleAnalyticsTrackerGoogle.class.php"/>
           <file role="data" name="sfGoogleAnalyticsTrackerUrchin.class.php"/>
+          <file role="data" name="sfGoogleAnalyticsTrackerAsynchronous.class.php"/>
         </dir>
         <dir name="transaction">
           <file role="data" name="sfGoogleAnalyticsItem.class.php"/>

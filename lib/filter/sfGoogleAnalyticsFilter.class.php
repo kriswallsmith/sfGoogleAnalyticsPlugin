@@ -24,9 +24,14 @@ class sfGoogleAnalyticsFilter extends sfFilter
     
     if ($this->isFirstCall())
     {
-      $classes = array_merge(array(
-        'urchin' => 'sfGoogleAnalyticsTrackerUrchin',
-        'google' => 'sfGoogleAnalyticsTrackerGoogle'), sfConfig::get($prefix.'classes', array()));
+      $classes = array_merge(
+        array(
+          'urchin'       => 'sfGoogleAnalyticsTrackerUrchin',
+          'google'       => 'sfGoogleAnalyticsTrackerGoogle',
+          'asynchronous' => 'sfGoogleAnalyticsTrackerAsynchronous',
+        ),
+        sfConfig::get($prefix.'classes', array())
+      );
       $class = $classes[sfConfig::get($prefix.'tracker', 'urchin')];
       
       $tracker = new $class($this->context);

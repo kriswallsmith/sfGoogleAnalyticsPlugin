@@ -5,8 +5,9 @@
 #     insertion:  bottom
 #     tracker:    urchin
 #     classes:
-#       urchin:   sfGoogleAnalyticsTrackerUrchin
-#       google:   sfGoogleAnalyticsTrackerGoogle
+#       urchin:       sfGoogleAnalyticsTrackerUrchin
+#       google:       sfGoogleAnalyticsTrackerGoogle
+#       asynchronous: sfGoogleAnalyticsTrackerAsynchronous
 # 
 #     # tracker configuration, all optional
 #     params:
