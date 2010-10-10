@@ -49,7 +49,7 @@ all:
 
 You'll have to copy the `profile_id` value out of the tracking code Google supplies for your site profile. This value typically starts with the letter U and ends with a single digit.
 
-This plugin defaults to using the older `urchin` tracker. To take advantage of the latest featureset of Google Analytics, change the `tracker` value to `google`. This will insert the new `ga.js` tracking code into your project.
+This plugin defaults to using the older `urchin` tracker. To take advantage of the latest featureset of Google Analytics, change the `tracker` value to `google` for the older snippet or `asynchronous` for the more performant one. This will insert the new `ga.js` tracking code into your project.
 
 == Advanced Usage ==
 
