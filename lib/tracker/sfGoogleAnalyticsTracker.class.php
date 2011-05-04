@@ -850,7 +850,7 @@ abstract class sfGoogleAnalyticsTracker
       switch ($position)
       {
         case self::POSITION_TOP:
-        $new = preg_replace('/<body[^>]*>/i', "$0\n".$content."\n", $old, 1);
+        $new = str_ireplace('</head>', "\n".$content."\n</head>", $old);
         break;
         
         case self::POSITION_BOTTOM:
