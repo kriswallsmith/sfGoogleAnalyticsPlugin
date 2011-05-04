@@ -99,6 +99,7 @@ abstract class sfGoogleAnalyticsTracker
       'cookie_timeout'              => null,
       'campaign_keys'               => null,
       'anchor_policy'               => null,
+      'track_page_load_time'        => null,
       'ignored_organics'            => null,
       'ignored_referers'            => null,
       'sample_rate'                 => null,
