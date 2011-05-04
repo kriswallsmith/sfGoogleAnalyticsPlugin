@@ -1,6 +1,6 @@
 # all:
 #   sf_google_analytics_plugin:
-#     enabled:    off
+#     enabled:    false
 #     profile_id: XX-XXXXX-X
 #     insertion:  bottom
 #     tracker:    urchin
@@ -13,22 +13,23 @@
 #     params:
 #       page_name:                  ~         # this setting should be used in module.yml, not app.yml
 #       domain_name:                ~
-#       linker_policy:              off
+#       linker_policy:              false
 #       organic_referers:           [{ name: ~, param: ~ }]
 #       vars:                       []        # this setting also makes more sense to use in module.yml, not app.yml
 #       cookie_path:                /
-#       client_info_policy:         on
-#       hash_policy:                on
-#       detect_flash_policy:        on
-#       detect_title_policy:        on
+#       client_info_policy:         true
+#       hash_policy:                true
+#       detect_flash_policy:        true
+#       detect_title_policy:        true
 #       session_timeout:            3600      # 30 minutes
 #       cookie_timeout:             31536000  # six months
 #       campaign_keys:              { name: ~, source: ~, medium: ~, term: ~, content: ~, id: ~, no_override: ~ }
-#       anchor_policy:              off
+#       anchor_policy:              false
+#       track_page_load_time:       false
 #       ignored_organics:           []
 #       ignored_referers:           []
 #       sample_rate:                100       # 100%
-#       local_remote_server_policy: off
+#       local_remote_server_policy: false
 # 
 #       # specific to "google" tracker
 #       tracker_var:                pageTracker

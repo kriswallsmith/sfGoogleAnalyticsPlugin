@@ -230,6 +230,11 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
       $html[] = sprintf('%s.push(["_trackPageview"]);', $tracker);
     }
 
+    if ($this->getTrackPageLoadTime())
+    {
+      $html[] = sprintf('%s.push(["_trackPageLoadTime"]);', $tracker);
+    }
+
     foreach ($this->getVars() as $var)
     {
       $html[] = sprintf(

@@ -134,12 +134,12 @@ class sfGoogleAnalyticsTrackerGoogle extends sfGoogleAnalyticsTracker
     {
       $html[] = sprintf('%s._setCampNOKey(%s);', $tracker, $noOverrideKey);
     }
-    
+
     if ($this->getAnchorPolicy())
     {
       $html[] = sprintf('%s._setAllowAnchor(true);', $tracker);
     }
-    
+
     foreach ($this->getIgnoredOrganics() as $keyword)
     {
       $html[] = sprintf('%s._addIgnoredOrganic(%s);', $tracker, $keyword);
@@ -172,7 +172,12 @@ class sfGoogleAnalyticsTrackerGoogle extends sfGoogleAnalyticsTracker
     {
       $html[] = sprintf('%s._trackPageview();', $tracker);
     }
-    
+
+    if ($this->getTrackPageLoadTime())
+    {
+      $html[] = sprintf('%s._trackPageLoadTime();', $tracker);
+    }
+
     foreach ($this->getVars() as $var)
     {
       $html[] = sprintf('%s._setVar(%s);', $tracker, $this->escape($var));
