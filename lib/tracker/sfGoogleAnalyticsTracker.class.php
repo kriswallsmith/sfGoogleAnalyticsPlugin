@@ -138,12 +138,17 @@ abstract class sfGoogleAnalyticsTracker
     {
       $this->setLocalRemoteServerPolicy($params['local_remote_server_policy']);
     }
-    
+
     if (!is_null($params['anchor_policy']))
     {
       $this->setAnchorPolicy($params['anchor_policy']);
     }
-    
+
+    if (!is_null($params['track_page_load_time']))
+    {
+      $this->setTrackPageLoadTime($params['track_page_load_time']);
+    }
+
     if (!is_null($params['client_info_policy']))
     {
       $this->setClientInfoPolicy($params['client_info_policy']);
@@ -661,7 +666,22 @@ abstract class sfGoogleAnalyticsTracker
   {
     return $this->campaignNoOverrideKey;
   }
+
+  /**
+   * Track page load time or not.
+   * 
+   * @param   bool $enabled
+   */
+  public function setTrackPageLoadTime($enabled)
+  {
+    $this->trackPageLoadTime = (bool) $enabled;
+  }
   
+  public function getTrackPageLoadTime()
+  {
+    return $this->trackPageLoadTime;
+  }
+
   /**
    * Define an anchor policy.
    * 
@@ -830,7 +850,7 @@ abstract class sfGoogleAnalyticsTracker
       switch ($position)
       {
         case self::POSITION_TOP:
-        $new = preg_replace('/<body[^>]*>/i', "$0\n".$content."\n", $old, 1);
+        $new = str_ireplace('</head>', "\n".$content."\n</head>", $old);
         break;
         
         case self::POSITION_BOTTOM:

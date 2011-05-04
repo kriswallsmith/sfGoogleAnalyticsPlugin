@@ -42,7 +42,7 @@ Basic configuration is done in your application's `app.yml` file:
 #!yaml
 all:
   sf_google_analytics_plugin:
-    enabled:      on
+    enabled:      true
     profile_id:   XX-XXXXX-X
     tracker:      google
 }}}
@@ -152,13 +152,13 @@ all:
   # disable tracking for this module...
   sf_google_analytics_plugin:
     params:
-      enabled off
+      enabled: false
   
   # ...or for a single action
   index:
     sf_google_analytics_plugin:
       params:
-        enabled off
+        enabled: false
 }}}
 
 Alternatively, you can access the tracker object directly from inside your action:
