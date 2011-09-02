@@ -16,6 +16,7 @@
 #       linker_policy:              false
 #       organic_referers:           [{ name: ~, param: ~ }]
 #       vars:                       []        # this setting also makes more sense to use in module.yml, not app.yml
+#       custom_vars:                []        # this setting also makes more sense to use in module.yml, not app.yml
 #       cookie_path:                /
 #       client_info_policy:         true
 #       hash_policy:                true

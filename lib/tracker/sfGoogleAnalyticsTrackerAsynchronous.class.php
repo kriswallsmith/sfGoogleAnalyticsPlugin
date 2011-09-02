@@ -244,6 +244,29 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
       );
     }
 
+    foreach ($this->getCustomVars() as $slot => $var)
+    {
+      if ($var[2]) { // with scope
+        $html[] = sprintf(
+          '%s.push(["_setCustomVar", %d, %s, %s, %d]);',
+          $tracker,
+          $slot,
+          $this->escape($var[0]), // name
+          $this->escape($var[1]), // value
+          $var[2] // scope
+        );
+      }
+      else {
+        $html[] = sprintf(
+          '%s.push(["_setCustomVar", %d, %s, %s]);',
+          $tracker,
+          $slot,
+          $this->escape($var[0]), // name
+          $this->escape($var[1]) // value
+        );
+      }
+    }
+
     if ($transaction = $this->getTransaction())
     {
       $values = array_map(array($this, "escape"), $transaction->getValues());

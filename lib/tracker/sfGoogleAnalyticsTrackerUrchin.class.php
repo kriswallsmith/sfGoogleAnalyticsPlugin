@@ -145,7 +145,10 @@ class sfGoogleAnalyticsTrackerUrchin extends sfGoogleAnalyticsTracker
     {
       $html[] = sprintf('__utmSetVar(%s);', $this->escape($var));
     }
-    
+
+    // custom vars does not exist for urchin
+
+
     if ($after = $this->getAfterTrackerJS())
     {
       $html[] = $after;

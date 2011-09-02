@@ -182,7 +182,18 @@ class sfGoogleAnalyticsTrackerGoogle extends sfGoogleAnalyticsTracker
     {
       $html[] = sprintf('%s._setVar(%s);', $tracker, $this->escape($var));
     }
-    
+
+    foreach ($this->getCustomVars() as $slot => $var)
+    {
+      if ($var[2]) { // with scope option
+        $html[] = sprintf('%s._setCustomVar(%d, %s, %s, %d);', $tracker, $slot, $this->escape($var[0]), $this->escape($var[1]), $var[2]);
+      }
+      else {
+        $html[] = sprintf('%s._setCustomVar(%d, %s, %s);', $tracker, $slot, $this->escape($var[0]), $this->escape($var[1]));
+      }
+    }
+
+
     if ($transaction = $this->getTransaction())
     {
       $values = array_map(array($this, 'escape'), $transaction->getValues());
