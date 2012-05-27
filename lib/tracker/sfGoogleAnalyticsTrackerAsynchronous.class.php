@@ -217,6 +217,23 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
       $html[] = $before;
     }
 
+    foreach ($this->getVars() as $var)
+    {
+      $html[] = sprintf(
+        '%s.push(["_setVar", %s]);',
+        $tracker,
+        $this->escape($var)
+      );
+    }
+
+    if ($this->getTrackPageLoadTime())
+    {
+      $html[] = sprintf('%s.push(["_trackPageLoadTime"]);', $tracker);
+    }
+
+    $html = $this->getCustomVarsHtml($tracker, $html);
+
+
     if ($pageName = $this->getPageName())
     {
       $html[] = sprintf(
@@ -229,23 +246,6 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
     {
       $html[] = sprintf('%s.push(["_trackPageview"]);', $tracker);
     }
-
-    if ($this->getTrackPageLoadTime())
-    {
-      $html[] = sprintf('%s.push(["_trackPageLoadTime"]);', $tracker);
-    }
-
-    foreach ($this->getVars() as $var)
-    {
-      $html[] = sprintf(
-        '%s.push(["_setVar", %s]);',
-        $tracker,
-        $this->escape($var)
-      );
-    }
-
-
-    $html = $this->getCustomVarsHtml($tracker, $html);
 
 
     if ($transaction = $this->getTransaction())

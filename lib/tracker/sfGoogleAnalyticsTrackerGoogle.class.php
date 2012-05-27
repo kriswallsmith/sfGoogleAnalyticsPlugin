@@ -194,6 +194,16 @@ class sfGoogleAnalyticsTrackerGoogle extends sfGoogleAnalyticsTracker
     }
 
 
+    if ($pageName = $this->getPageName())
+    {
+      $html[] = sprintf('%s._trackPageview(%s);', $tracker, $this->escape($pageName));
+    }
+    else
+    {
+      $html[] = sprintf('%s._trackPageview();', $tracker);
+    }
+
+
     if ($transaction = $this->getTransaction())
     {
       $values = array_map(array($this, 'escape'), $transaction->getValues());
