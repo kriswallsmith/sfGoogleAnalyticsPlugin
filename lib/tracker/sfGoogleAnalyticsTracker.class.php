@@ -482,6 +482,12 @@ abstract class sfGoogleAnalyticsTracker
   }
 
 
+  public function hasCustomVars()
+  {
+    return count($this->customVars);
+  }
+
+
   /**
    * Set a path to limit the tracking cookie to.
    * 

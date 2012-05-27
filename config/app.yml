@@ -4,6 +4,10 @@
 #     profile_id: XX-XXXXX-X
 #     insertion:  bottom
 #     tracker:    urchin
+#     insert_custom_vars_if_ajax: false      # Only implemented for async tracker:
+#                                            # in ajax requests, insert ONLY the custom vars, if they are defined.
+#                                            # You still need to make a js call with _trackPageView/_trackEvent (in js, for example)
+#                                            # This feature was designed to works with pjax, which triggers a _trackPageView() after request
 #     classes:
 #       urchin:       sfGoogleAnalyticsTrackerUrchin
 #       google:       sfGoogleAnalyticsTrackerGoogle
