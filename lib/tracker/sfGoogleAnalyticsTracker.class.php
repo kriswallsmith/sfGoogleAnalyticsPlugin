@@ -47,8 +47,9 @@ abstract class sfGoogleAnalyticsTracker
     $cookieTimeout            = null,
     $cookiePath               = null,
     $vars                     = array(),
-    $transaction              = null;
-  
+    $transaction              = null,
+    $trackPageLoadTime        = true; 
+ 
   public function __construct($context, $parameters = array())
   {
     $this->initialize($context, $parameters);
