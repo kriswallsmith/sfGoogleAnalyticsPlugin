@@ -4,6 +4,10 @@
 #     profile_id: XX-XXXXX-X
 #     insertion:  bottom
 #     tracker:    urchin
+#     insert_custom_vars_if_ajax: false      # Only implemented for async tracker:
+#                                            # in ajax requests, insert ONLY the custom vars, if they are defined.
+#                                            # You still need to make a js call with _trackPageView/_trackEvent (in js, for example)
+#                                            # This feature was designed to works with pjax, which triggers a _trackPageView() after request
 #     classes:
 #       urchin:       sfGoogleAnalyticsTrackerUrchin
 #       google:       sfGoogleAnalyticsTrackerGoogle
@@ -16,6 +20,8 @@
 #       linker_policy:              false
 #       organic_referers:           [{ name: ~, param: ~ }]
 #       vars:                       []        # this setting also makes more sense to use in module.yml, not app.yml
+#       custom_vars:                          # this setting also makes more sense to use in module.yml, not app.yml
+#         - [ 0, "name", "value", 1 ]         # Example [ slotNumber, variableName, variableValue, scope ]
 #       cookie_path:                /
 #       client_info_policy:         true
 #       hash_policy:                true
