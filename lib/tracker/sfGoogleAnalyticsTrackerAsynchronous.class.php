@@ -217,6 +217,23 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
       $html[] = $before;
     }
 
+    foreach ($this->getVars() as $var)
+    {
+      $html[] = sprintf(
+        '%s.push(["_setVar", %s]);',
+        $tracker,
+        $this->escape($var)
+      );
+    }
+
+    if ($this->getTrackPageLoadTime())
+    {
+      $html[] = sprintf('%s.push(["_trackPageLoadTime"]);', $tracker);
+    }
+
+    $html = $this->getCustomVarsHtml($tracker, $html);
+
+
     if ($pageName = $this->getPageName())
     {
       $html[] = sprintf(
@@ -230,19 +247,6 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
       $html[] = sprintf('%s.push(["_trackPageview"]);', $tracker);
     }
 
-    if ($this->getTrackPageLoadTime())
-    {
-      $html[] = sprintf('%s.push(["_trackPageLoadTime"]);', $tracker);
-    }
-
-    foreach ($this->getVars() as $var)
-    {
-      $html[] = sprintf(
-        '%s.push(["_setVar", %s]);',
-        $tracker,
-        $this->escape($var)
-      );
-    }
 
     if ($transaction = $this->getTransaction())
     {
@@ -283,6 +287,55 @@ class sfGoogleAnalyticsTrackerAsynchronous extends sfGoogleAnalyticsTracker
     $html = implode("\n", $html);
     $this->doInsert($response, $html, $this->insertion);
   }
+
+
+  public function insertOnlyCustomVars(sfResponse $response)
+  {
+    $tracker = $this->getTrackerVar();
+
+    $html = array();
+    $html[] = '<script type="text/javascript">';
+    $html[] = '//<![CDATA[';
+    $html[] = sprintf('var %s = %s || [];', $tracker, $tracker);
+
+    $html = $this->getCustomVarsHtml($tracker, $html);
+
+    $html[] = '//]]>';
+    $html[] = '</script>';
+
+    $html = implode("\n", $html);
+    $this->doInsert($response, $html, $this->insertion);
+  }
+
+
+  protected function getCustomVarsHtml($tracker, $html)
+  {
+    foreach ($this->getCustomVars() as $slot => $var)
+    {
+      if ($var[2]) { // with scope
+        $html[] = sprintf(
+          '%s.push(["_setCustomVar", %d, %s, %s, %d]);',
+          $tracker,
+          $slot,
+          $this->escape($var[0]), // name
+          $this->escape($var[1]), // value
+          $var[2] // scope
+        );
+      }
+      else {
+        $html[] = sprintf(
+          '%s.push(["_setCustomVar", %d, %s, %s]);',
+          $tracker,
+          $slot,
+          $this->escape($var[0]), // name
+          $this->escape($var[1]) // value
+        );
+      }
+    }
+
+    return $html;
+  }
+
 
   /**
    * @see sfGoogleAnalyticsTracker

@@ -73,6 +73,19 @@ class sfGoogleAnalyticsFilter extends sfFilter
       
       $tracker->insert($response);
     }
+    elseif (sfConfig::get($prefix.'insert_custom_vars_if_ajax', false)
+      && $tracker->hasCustomVars()
+      && $request->isXmlHttpRequest()
+      && $tracker->isEnabled())
+    {
+
+      if (sfConfig::get('sf_logging_enabled'))
+      {
+        sfGoogleAnalyticsToolkit::logMessage($this, 'Inserting tracking code for custom vars only (ajax call).');
+      }
+
+      $tracker->insertOnlyCustomVars($response);
+    }
     elseif (sfConfig::get('sf_logging_enabled'))
     {
       sfGoogleAnalyticsToolkit::logMessage($this, 'Tracking code not inserted.');

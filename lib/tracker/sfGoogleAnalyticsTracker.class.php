@@ -2,7 +2,7 @@
 
 /**
  * Houses the core API for manipulating the Google Analytics tracking code.
- * 
+ *
  * @package     sfGoogleAnalyticsPlugin
  * @subpackage  tracker
  * @author      Kris Wallsmith <kris.wallsmith@symfony-project.com>
@@ -13,13 +13,13 @@ abstract class sfGoogleAnalyticsTracker
   const
     POSITION_TOP              = 'top',
     POSITION_BOTTOM           = 'bottom';
-  
+
   protected
     $context                  = null,
     $parameterHolder          = null,
     $beforeTrackerJS          = null,
     $afterTrackerJS           = null,
-    
+
     $enabled                  = false,
     $profileId                = null,
     $insertion                = null,
@@ -47,37 +47,38 @@ abstract class sfGoogleAnalyticsTracker
     $cookieTimeout            = null,
     $cookiePath               = null,
     $vars                     = array(),
-    $transaction              = null,
-    $trackPageLoadTime        = false; 
- 
+    $customVars               = array(),
+    $trackPageLoadTime        = false,
+    $transaction              = null;
+
   public function __construct($context, $parameters = array())
   {
     $this->initialize($context, $parameters);
   }
-  
+
   public function initialize($context, $parameters = array())
   {
     $this->context = $context;
-    
+
     $this->parameterHolder = class_exists('sfNamespacedParameterHolder') ? new sfNamespacedParameterHolder : new sfParameterHolder;
     $this->parameterHolder->add($parameters);
-    
+
     // apply configuration from app.yml
     $prefix = 'app_sf_google_analytics_plugin_';
-    
+
     $params = sfConfig::get($prefix.'params', array());
     $params['enabled']    = sfConfig::get($prefix.'enabled');
     $params['profile_id'] = sfConfig::get($prefix.'profile_id');
     $params['insertion']  = sfConfig::get($prefix.'insertion');
-    
+
     $this->configure($params);
-    
+
     return true;
   }
-  
+
   /**
    * Apply non-null configuration values.
-   * 
+   *
    * @param   array $params
    */
   public function configure($params)
@@ -91,6 +92,7 @@ abstract class sfGoogleAnalyticsTracker
       'linker_policy'               => null,
       'organic_referers'            => null,
       'vars'                        => null,
+      'custom_vars'                 => null,
       'cookie_path'                 => null,
       'client_info_policy'          => null,
       'hash_policy'                 => null,
@@ -105,37 +107,37 @@ abstract class sfGoogleAnalyticsTracker
       'ignored_referers'            => null,
       'sample_rate'                 => null,
       'local_remote_server_policy'  => null), $params);
-    
+
     if (!is_null($params['enabled']))
     {
       $this->setEnabled($params['enabled']);
     }
-    
+
     if (!is_null($params['profile_id']))
     {
       $this->setProfileId($params['profile_id']);
     }
-    
+
     if (!is_null($params['page_name']))
     {
       $this->setPageName($params['page_name']);
     }
-    
+
     if (!is_null($params['insertion']))
     {
       $this->setInsertion($params['insertion']);
     }
-    
+
     if (!is_null($params['domain_name']))
     {
       $this->setDomainName($params['domain_name']);
     }
-    
+
     if (!is_null($params['linker_policy']))
     {
       $this->setLinkerPolicy($params['linker_policy']);
     }
-    
+
     if (!is_null($params['local_remote_server_policy']))
     {
       $this->setLocalRemoteServerPolicy($params['local_remote_server_policy']);
@@ -155,22 +157,22 @@ abstract class sfGoogleAnalyticsTracker
     {
       $this->setClientInfoPolicy($params['client_info_policy']);
     }
-    
+
     if (!is_null($params['hash_policy']))
     {
       $this->setHashPolicy($params['hash_policy']);
     }
-    
+
     if (!is_null($params['detect_flash_policy']))
     {
       $this->setDetectFlashPolicy($params['detect_flash_policy']);
     }
-    
+
     if (!is_null($params['detect_title_policy']))
     {
       $this->setDetectTitlePolicy($params['detect_title_policy']);
     }
-    
+
     if (!is_null($params['organic_referers']))
     {
       foreach ($params['organic_referers'] as $referer)
@@ -180,7 +182,7 @@ abstract class sfGoogleAnalyticsTracker
           $this->addOrganicReferer($referer['name'], $referer['param']);
       }
     }
-    
+
     if (!is_null($params['ignored_organics']))
     {
       foreach ($params['ignored_organics'] as $keyword)
@@ -188,7 +190,7 @@ abstract class sfGoogleAnalyticsTracker
         $this->addIgnoredOrganic($keyword);
       }
     }
-    
+
     if (!is_null($params['ignored_referers']))
     {
       foreach ($params['ignored_referers'] as $referer)
@@ -196,7 +198,7 @@ abstract class sfGoogleAnalyticsTracker
         $this->addIgnoredReferer($referer);
       }
     }
-    
+
     if (!is_null($params['campaign_keys']))
     {
       foreach ($params['campaign_keys'] as $key => $value)
@@ -205,27 +207,27 @@ abstract class sfGoogleAnalyticsTracker
         $this->$method($value);
       }
     }
-    
+
     if (!is_null($params['sample_rate']))
     {
       $this->setSampleRate($params['sample_rate']);
     }
-    
+
     if (!is_null($params['session_timeout']))
     {
       $this->setSessionTimeout($params['session_timeout']);
     }
-    
+
     if (!is_null($params['cookie_timeout']))
     {
       $this->setCookieTimeout($params['cookie_timeout']);
     }
-    
+
     if (!is_null($params['cookie_path']))
     {
       $this->setCookiePath($params['cookie_path']);
     }
-    
+
     if (!is_null($params['vars']))
     {
       foreach ($params['vars'] as $var)
@@ -233,36 +235,44 @@ abstract class sfGoogleAnalyticsTracker
         $this->setVar($var);
       }
     }
+
+    if (!is_null($params['custom_vars']))
+    {
+      foreach ($params['custom_vars'] as $var)
+      {
+        $this->setCustomVar($var[0], $var[1], $var[2], $var[3]);
+      }
+    }
   }
-  
+
   public function getContext()
   {
     return $this->context;
   }
-  
+
   public function getParameterHolder()
   {
     return $this->parameterHolder;
   }
-  
+
   public function getParameter($name, $default = null, $ns = null)
   {
     return $this->parameterHolder->get($name, $default, $ns);
   }
-  
+
   public function hasParameter($name, $ns = null)
   {
     return $this->parameterHolder->has($name, $ns);
   }
-  
+
   public function setParameter($name, $value, $ns = null)
   {
     return $this->parameterHolder->set($name, $value, $ns);
   }
-  
+
   /**
    * Add JS to include immediately before the tracker function is called.
-   * 
+   *
    * @param   string $js
    * @param   array $options
    */
@@ -273,15 +283,15 @@ abstract class sfGoogleAnalyticsTracker
       $this->beforeTrackerJS = $js;
     }
   }
-  
+
   public function getBeforeTrackerJS()
   {
     return $this->beforeTrackerJS;
   }
-  
+
   /**
    * Add JS to include at the bottom of the tracker code.
-   * 
+   *
    * @param   string $js
    * @param   array $options
    */
@@ -292,45 +302,45 @@ abstract class sfGoogleAnalyticsTracker
       $this->afterTrackerJS = $js;
     }
   }
-  
+
   public function getAfterTrackerJS()
   {
     return $this->afterTrackerJS;
   }
-  
+
   /**
    * Toggle tracker's enabled state.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setEnabled($enabled)
   {
     $this->enabled = (bool) $enabled;
   }
-  
+
   public function isEnabled()
   {
     return $this->enabled;
   }
-  
+
   /**
    * Set the profile ID to use for this tracker.
-   * 
+   *
    * @param   string $profileId
    */
   public function setProfileId($profileId)
   {
     $this->profileId = $profileId;
   }
-  
+
   public function getProfileId()
   {
     return $this->profileId;
   }
-  
+
   /**
    * Set where the tracking code should be inserted into the response.
-   * 
+   *
    * @param   string $insertion
    * @param   array $options
    */
@@ -341,15 +351,15 @@ abstract class sfGoogleAnalyticsTracker
       $this->insertion = $insertion;
     }
   }
-  
+
   public function getInsertion()
   {
     return $this->insertion;
   }
-  
+
   /**
    * Define a page other than what's in the address bar.
-   * 
+   *
    * @param   string $pageName
    * @param   array $options
    */
@@ -360,15 +370,15 @@ abstract class sfGoogleAnalyticsTracker
       $this->pageName = $pageName;
     }
   }
-  
+
   public function getPageName()
   {
     return $this->pageName;
   }
-  
+
   /**
    * Set the domain to track this website as.
-   * 
+   *
    * @param   string $domainName
    */
   public function setDomainName($domainName)
@@ -377,33 +387,33 @@ abstract class sfGoogleAnalyticsTracker
     {
       $domainName = 'none';
     }
-    
+
     $this->domainName = $domainName;
   }
-  
+
   public function getDomainName()
   {
     return $this->domainName;
   }
-  
+
   /**
    * Define a linker policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setLinkerPolicy($enabled)
   {
     $this->linkerPolicy = (bool) $enabled;
   }
-  
+
   public function getLinkerPolicy()
   {
     return $this->linkerPolicy;
   }
-  
+
   /**
    * Set a transaction to track in the response.
-   * 
+   *
    * @param   sfGoogleAnalyticsTransaction $transaction
    * @param   array $options
    */
@@ -414,15 +424,15 @@ abstract class sfGoogleAnalyticsTracker
       $this->transaction = $transaction;
     }
   }
-  
+
   public function getTransaction()
   {
     return $this->transaction;
   }
-  
+
   /**
    * Add an organic referer.
-   * 
+   *
    * @param   string $name
    * @param   string $param
    */
@@ -430,15 +440,15 @@ abstract class sfGoogleAnalyticsTracker
   {
     $this->organicReferers[] = array($name, $param);
   }
-  
+
   public function getOrganicReferers()
   {
     return $this->organicReferers;
   }
-  
+
   /**
    * Add a custom tracking variable to this cookie.
-   * 
+   *
    * @param   string $var
    * @param   array $options
    */
@@ -449,15 +459,46 @@ abstract class sfGoogleAnalyticsTracker
       $this->vars[] = $var;
     }
   }
-  
+
   public function getVars()
   {
     return $this->vars;
   }
-  
+
+
+  /**
+   * Add a custom tracking variables to this cookie
+   * using the setCustomVar method (not for urchin)
+   *
+   * @param   int $slot The index of the var, between 1 - 5. A variable should always use the same slot.
+   * @param   string $name The name that identifies the custom variable
+   * @param   string $value The value of the var
+   * @param   int $scope An optional scope: 1 (visitor-level), 2 (session-level), or 3 (page-level). Default is page-level interaction
+   * @param   array $options
+   */
+  public function setCustomVar($slot, $name, $value, $scope = false, $options = array())
+  {
+    if ($this->prepare($value, $options))
+    {
+      $this->customVars[$slot] = array($name, $value, $scope);
+    }
+  }
+
+  public function getCustomVars()
+  {
+    return $this->customVars;
+  }
+
+
+  public function hasCustomVars()
+  {
+    return count($this->customVars);
+  }
+
+
   /**
    * Set a path to limit the tracking cookie to.
-   * 
+   *
    * @param   string $path
    * @param   array $options
    */
@@ -468,202 +509,202 @@ abstract class sfGoogleAnalyticsTracker
       $this->cookiePath = $path;
     }
   }
-  
+
   public function getCookiePath()
   {
     return $this->cookiePath;
   }
-  
+
   /**
    * Define a client info detection policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setClientInfoPolicy($enabled)
   {
     $this->clientInfoPolicy = (bool) $enabled;
   }
-  
+
   public function getClientInfoPolicy()
   {
     return $this->clientInfoPolicy;
   }
-  
+
   /**
    * Define a hash policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setHashPolicy($enabled)
   {
     $this->hashPolicy = (bool) $enabled;
   }
-  
+
   public function getHashPolicy()
   {
     return $this->hashPolicy;
   }
-  
+
   /**
    * Define a flash detection policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setDetectFlashPolicy($enabled)
   {
     $this->detectFlashPolicy = (bool) $enabled;
   }
-  
+
   public function getDetectFlashPolicy()
   {
     return $this->detectFlashPolicy;
   }
-  
+
   /**
    * Define a title detection policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setDetectTitlePolicy($enabled)
   {
     $this->detectTitlePolicy = $enabled;
   }
-  
+
   public function getDetectTitlePolicy()
   {
     return $this->detectTitlePolicy;
   }
-  
+
   /**
    * Set a session timeout.
-   * 
+   *
    * @param   int $seconds
    */
   public function setSessionTimeout($seconds)
   {
     $this->sessionTimeout = (int) $seconds;
   }
-  
+
   public function getSessionTimeout()
   {
     return $this->sessionTimeout;
   }
-  
+
   /**
    * Set a cookie timeout.
-   * 
+   *
    * @param   int $seconds
    */
   public function setCookieTimeout($seconds)
   {
     $this->cookieTimeout = (int) $seconds;
   }
-  
+
   public function getCookieTimeout()
   {
     return $this->cookieTimeout;
   }
-  
+
   /**
    * Set a campaign name parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignNameKey($key)
   {
     $this->campaignNameKey = $key;
   }
-  
+
   public function getCampaignNameKey()
   {
     return $this->campaignNameKey;
   }
-  
+
   /**
    * Set a campaign source parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignSourceKey($key)
   {
     $this->campaignSourceKey = $key;
   }
-  
+
   public function getCampaignSourceKey()
   {
     return $this->campaignSourceKey;
   }
-  
+
   /**
    * Set a campaign medium parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignMediumKey($key)
   {
     $this->campaignMediumKey = $key;
   }
-  
+
   public function getCampaignMediumKey()
   {
     return $this->campaignMediumKey;
   }
-  
+
   /**
    * Set a campaign term parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignTermKey($key)
   {
     $this->campaignTermKey = $key;
   }
-  
+
   public function getCampaignTermKey()
   {
     return $this->campaignTermKey;
   }
-  
+
   /**
    * Set a campaign content parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignContentKey($key)
   {
     $this->campaignContentKey = $key;
   }
-  
+
   public function getCampaignContentKey()
   {
     return $this->campaignContentKey;
   }
-  
+
   /**
    * Set a campaign ID parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignIdKey($key)
   {
     $this->campaignIdKey = $key;
   }
-  
+
   public function getCampaignIdKey()
   {
     return $this->campaignIdKey;
   }
-  
+
   /**
    * Set a campaign no override parameter key.
-   * 
+   *
    * @param   string $key
    */
   public function setCampaignNoOverrideKey($key)
   {
     $this->campaignNoOverrideKey = $key;
   }
-  
+
   public function getCampaignNoOverrideKey()
   {
     return $this->campaignNoOverrideKey;
@@ -671,14 +712,14 @@ abstract class sfGoogleAnalyticsTracker
 
   /**
    * Track page load time or not.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setTrackPageLoadTime($enabled)
   {
     $this->trackPageLoadTime = (bool) $enabled;
   }
-  
+
   public function getTrackPageLoadTime()
   {
     return $this->trackPageLoadTime;
@@ -686,97 +727,97 @@ abstract class sfGoogleAnalyticsTracker
 
   /**
    * Define an anchor policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setAnchorPolicy($enabled)
   {
     $this->anchorPolicy = (bool) $enabled;
   }
-  
+
   public function getAnchorPolicy()
   {
     return $this->anchorPolicy;
   }
-  
+
   /**
    * Add an ignored orgnic keyword.
-   * 
+   *
    * @param   string $keyword
    */
   public function addIgnoredOrganic($keyword)
   {
     $this->ignoredOrganics[] = $keyword;
   }
-  
+
   public function getIgnoredOrganics()
   {
     return $this->ignoredOrganics;
   }
-  
+
   /**
    * Add an ignored referer.
-   * 
+   *
    * @param   string $referer
    */
   public function addIgnoredReferer($referer)
   {
     $this->ignoredReferers[] = $referer;
   }
-  
+
   public function getIgnoredReferers()
   {
     return $this->ignoredReferers;
   }
-  
+
   /**
    * Set a sample rate.
-   * 
+   *
    * @param   int $rate
    */
   public function setSampleRate($rate)
   {
     $this->sampleRate = (int) $rate;
   }
-  
+
   public function getSampleRate()
   {
     return $this->sampleRate;
   }
-  
+
   /**
    * Define a local/remove server policy.
-   * 
+   *
    * @param   bool $enabled
    */
   public function setLocalRemoteServerPolicy($enabled)
   {
     $this->localRemoteServerPolicy = (bool) $enabled;
   }
-  
+
   public function getLocalRemoteServerPolicy()
   {
     return $this->localRemoteServerPolicy;
   }
-  
+
   /**
    * Extract options used by tracker's helper functions.
-   * 
+   *
    * View options include:
-   * 
+   *
    *  * track_as
    *  * is_route
    *  * is_event
    *  * use_linker
-   * 
+   *
    * @param   array $options
-   * 
+   *
    * @return  array
    */
   public function extractViewOptions(& $options)
   {
     $viewOptions = array();
-    
+
     foreach (array('track_as', 'is_route', 'is_event', 'use_linker') as $option)
     {
       if (isset($options[$option]))
@@ -785,48 +826,48 @@ abstract class sfGoogleAnalyticsTracker
         unset($options[$option]);
       }
     }
-    
+
     return $viewOptions;
   }
-  
+
   /**
    * Forge a call to the Javascript page view function.
-   * 
+   *
    * @param   string $path
    * @param   array $options
-   * 
+   *
    * @return  string
    */
   abstract public function forgePageViewFunction($path = null, $options = array());
-  
+
   /**
    * Forge a call to the Javascript linker function.
-   * 
+   *
    * @param   string $path
-   * 
+   *
    * @return  string
    */
   abstract public function forgeLinkerFunction($url);
-  
+
   /**
    * Forge a call to the Javascript POST linker function.
-   * 
+   *
    * @param   string $formElement
-   * 
+   *
    * @return  string
    */
   abstract public function forgePostLinkerFunction($formElement = 'this');
-  
+
   /**
    * Insert tracking code into a response.
-   * 
+   *
    * @param   sfResponse $response
    */
   abstract public function insert(sfResponse $response);
-  
+
   /**
    * Insert content into a response.
-   * 
+   *
    * @param   sfResponse $response
    * @param   string $content
    * @param   string $position
@@ -837,10 +878,10 @@ abstract class sfGoogleAnalyticsTracker
     {
       $position = self::POSITION_BOTTOM;
     }
-    
+
     // check for overload
     $method = 'doInsert'.$position;
-    
+
     if (method_exists($this, $method))
     {
       call_user_func(array($this, $method), $response, $content);
@@ -848,33 +889,33 @@ abstract class sfGoogleAnalyticsTracker
     else
     {
       $old = $response->getContent();
-      
+
       switch ($position)
       {
         case self::POSITION_TOP:
         $new = str_ireplace('</head>', "\n".$content."\n</head>", $old);
         break;
-        
+
         case self::POSITION_BOTTOM:
         $new = str_ireplace('</body>', "\n".$content."\n</body>", $old);
         break;
       }
-      
+
       if ($old == $new)
       {
         $new .= $content;
       }
-      
+
       $response->setContent($new);
     }
   }
-  
+
   /**
    * Apply common options to a value.
-   * 
+   *
    * @param   mixed $value
    * @param   mixed $options
-   * 
+   *
    * @return  bool  whether to continue execution
    */
   protected function prepare(& $value, & $options = array())
@@ -883,16 +924,16 @@ abstract class sfGoogleAnalyticsTracker
     {
       $options = sfToolkit::stringToArray($options);
     }
-    
+
     if (isset($options['use_flash']) && $options['use_flash'])
     {
       unset($options['use_flash']);
-      
+
       $trace = debug_backtrace();
-      
+
       $caller = $trace[1];
       $this->plant($caller['function'], array($value, $options));
-      
+
       return false;
     }
     else
@@ -902,14 +943,14 @@ abstract class sfGoogleAnalyticsTracker
         $value = $this->context->getController()->genUrl($value);
         unset($options['is_route']);
       }
-      
+
       return true;
     }
   }
-  
+
   /**
    * Plant a callable to be executed against the next request's tracker.
-   * 
+   *
    * @param   string $method
    * @param   array $arguments
    */
@@ -919,19 +960,19 @@ abstract class sfGoogleAnalyticsTracker
     {
       sfGoogleAnalyticsToolkit::logMessage($this, 'Storing call to %s method for next response.');
     }
-    
+
     $callables = $this->parameterHolder->getAll('flash', array());
     $callables[] = array($method, $arguments);
-    
+
     $this->parameterHolder->removeNamespace('flash');
     $this->parameterHolder->add($callables, 'flash');
   }
-  
+
   /**
    * Escape the provided value for Javascript evaluation.
-   * 
+   *
    * @param   string $value
-   * 
+   *
    * @return  string
    */
   protected function escape($value)
@@ -945,13 +986,13 @@ abstract class sfGoogleAnalyticsTracker
       sfLoader::loadHelpers(array('Escaping'));
       $escaped = '"'.esc_js($value).'"';
     }
-    
+
     return $escaped;
   }
-  
+
   /**
    * Update storage with callables for the next tracker.
-   * 
+   *
    * @param   sfUser $user
    */
   public function shutdown($user)
@@ -960,8 +1001,8 @@ abstract class sfGoogleAnalyticsTracker
     {
       sfGoogleAnalyticsToolkit::logMessage($this, 'Copying callables to session storage.');
     }
-    
+
     $user->getAttributeHolder()->set('callables', $this->parameterHolder->getAll('flash', array()), 'sf_google_analytics_plugin');
   }
-  
+
 }

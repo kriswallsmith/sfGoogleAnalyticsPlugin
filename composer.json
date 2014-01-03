@@ -1,0 +1,36 @@
+{
+    "name": "kriswallsmith/sfGoogleAnalyticsPlugin",
+    "type": "symfony1-plugin",
+    "description": "Easily add Google Analytics tracking code to your presentation layer.",
+    "keywords": [ "symfony", "google analytics" ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kris Wallmith",
+            "email": "kris.wallsmith@gmail.com",
+            "homepage": "http://kriswallsmith.net",
+            "role": "developer"
+        },
+        {
+            "name": "Stephen Ostrow",
+            "email": "contact@stephenostrow.com",
+            "homepage": "http://stephenostrow.com",
+            "role": "developer"
+        },
+        {
+            "name": "Gordon Franke",
+            "homepage": "http://blog.nevalon.de",
+            "role": "developer"
+        },
+        {
+            "name": "Roman Drapeko",
+            "homepage": "https://github.com/drapeko",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "composer/installers": "dev-master",
+        "symfony/symfony1": "1.4.*"
+    }
+}
