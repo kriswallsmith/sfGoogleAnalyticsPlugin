@@ -2,7 +2,7 @@
     "name": "kriswallsmith/sfGoogleAnalyticsPlugin",
     "type": "symfony1-plugin",
     "description": "Easily add Google Analytics tracking code to your presentation layer.",
-    "keywords" [ "symfony", "google analytics" ],
+    "keywords": [ "symfony", "google analytics" ],
     "license": "MIT",
     "authors": [
         {
